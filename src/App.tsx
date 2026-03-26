@@ -40,7 +40,9 @@ import {
   Zap,
   Fuel,
   Gem,
+  Check,
   Building2,
+  Shield,
   ShieldCheck,
   AlertCircle,
   Menu,
@@ -213,6 +215,24 @@ const TRANSLATIONS = {
     brentOil: "Petróleo Brent",
     goldBullion: "Oro Bullion",
     sectionAvailableSoon: "Esta sección estará disponible próximamente en la terminal.",
+    searchByRefOrBank: "Buscar por referencia o banco",
+    filterBySectors: "Filtrar por sectores",
+    newPassword: "Nueva Contraseña",
+    confirmPassword: "Confirmar Contraseña",
+    requestVideoConf: "Solicitar Videoconferencia",
+    sendProposal: "Enviar Propuesta",
+    videoConfRequested: "Videoconferencia Solicitada",
+    proposalSent: "Propuesta Enviada",
+    passwordChanged: "Contraseña cambiada exitosamente",
+    filterByType: "Filtrar por Tipo",
+    associatedDocuments: "Documentos Asociados",
+    uploadSettlementDoc: "Subir Documento de Liquidación",
+    noDocuments: "No hay documentos asociados",
+    adminRole: "Administrador",
+    operatorRole: "Operador",
+    viewerRole: "Consultor",
+    accessDenied: "Acceso Denegado",
+    insufficientPermissions: "No tienes permisos suficientes para realizar esta acción.",
   },
   en: {
     dashboard: "Dashboard",
@@ -354,6 +374,24 @@ const TRANSLATIONS = {
     brentOil: "Brent Oil",
     goldBullion: "Gold Bullion",
     sectionAvailableSoon: "This section will be available soon in the terminal.",
+    searchByRefOrBank: "Search by reference or bank",
+    filterBySectors: "Filter by sectors",
+    newPassword: "New Password",
+    confirmPassword: "Confirm Password",
+    requestVideoConf: "Request Video Conference",
+    sendProposal: "Send Proposal",
+    videoConfRequested: "Video Conference Requested",
+    proposalSent: "Proposal Sent",
+    passwordChanged: "Password changed successfully",
+    filterByType: "Filter by Type",
+    associatedDocuments: "Associated Documents",
+    uploadSettlementDoc: "Upload Settlement Document",
+    noDocuments: "No associated documents",
+    adminRole: "Admin",
+    operatorRole: "Operator",
+    viewerRole: "Viewer",
+    accessDenied: "Access Denied",
+    insufficientPermissions: "You do not have sufficient permissions to perform this action.",
   }
 };
 
@@ -361,6 +399,72 @@ const TRANSLATIONS = {
 
 const LandingPage = ({ onEnter }: { onEnter: () => void }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [view, setView] = useState<'landing' | 'login' | 'register'>('landing');
+
+  if (view === 'login' || view === 'register') {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center p-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md bg-surface-container-lowest p-8 rounded-3xl border border-outline-variant/20 shadow-2xl"
+        >
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-primary rounded-sm flex items-center justify-center text-white font-black shrink-0">C</div>
+              <span className="text-xl font-black text-primary uppercase tracking-tighter font-headline">Core Foundry</span>
+            </div>
+            <button onClick={() => setView('landing')} className="p-2 hover:bg-surface-container rounded-full transition-colors">
+              <X className="w-5 h-5 text-on-surface-variant" />
+            </button>
+          </div>
+
+          <h2 className="text-3xl font-black text-primary uppercase tracking-tighter font-headline mb-2">
+            {view === 'login' ? 'Bienvenido de Nuevo' : 'Crear Cuenta'}
+          </h2>
+          <p className="text-sm text-on-surface-variant mb-8">
+            {view === 'login' ? 'Acceda a su terminal institucional' : 'Únase a la red de commodities más avanzada'}
+          </p>
+
+          <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); onEnter(); }}>
+            {view === 'register' && (
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Nombre de la Empresa</label>
+                <input type="text" required placeholder="Ej: Aurum Metals SA" className="w-full bg-surface-container-low border border-outline-variant/20 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-primary transition-colors" />
+              </div>
+            )}
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Correo Corporativo</label>
+              <input type="email" required placeholder="admin@empresa.com" className="w-full bg-surface-container-low border border-outline-variant/20 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Contraseña</label>
+              <input type="password" required placeholder="••••••••" className="w-full bg-surface-container-low border border-outline-variant/20 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-primary transition-colors" />
+            </div>
+            
+            <button 
+              type="submit"
+              className="w-full cta-gradient text-white py-5 rounded-xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:scale-[1.02] transition-all active:scale-95"
+            >
+              {view === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
+            </button>
+          </form>
+
+          <div className="mt-8 pt-8 border-t border-outline-variant/10 text-center">
+            <p className="text-xs text-on-surface-variant">
+              {view === 'login' ? '¿No tiene una cuenta?' : '¿Ya tiene una cuenta?'}
+              <button 
+                onClick={() => setView(view === 'login' ? 'register' : 'login')}
+                className="ml-2 text-primary font-black uppercase tracking-widest hover:underline"
+              >
+                {view === 'login' ? 'Registrarse' : 'Iniciar Sesión'}
+              </button>
+            </p>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface overflow-hidden selection:bg-primary selection:text-white">
@@ -377,7 +481,7 @@ const LandingPage = ({ onEnter }: { onEnter: () => void }) => {
           <a href="#solutions" className="hover:text-primary transition-colors">Soluciones</a>
           <a href="#compliance" className="hover:text-primary transition-colors">Compliance</a>
           <button 
-            onClick={onEnter}
+            onClick={() => setView('login')}
             className="bg-primary text-white px-6 py-2 rounded-sm hover:opacity-90 transition-all active:scale-95 cursor-pointer"
           >
             Acceder
@@ -387,7 +491,7 @@ const LandingPage = ({ onEnter }: { onEnter: () => void }) => {
         {/* Mobile Nav Toggle */}
         <div className="md:hidden flex items-center gap-2">
           <button 
-            onClick={onEnter}
+            onClick={() => setView('login')}
             className="bg-primary text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest active:scale-95 shadow-lg shadow-primary/20 shrink-0"
           >
             Acceder
@@ -417,7 +521,7 @@ const LandingPage = ({ onEnter }: { onEnter: () => void }) => {
               <button 
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  onEnter();
+                  setView('login');
                 }}
                 className="w-full bg-primary text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-primary/20"
               >
@@ -446,13 +550,16 @@ const LandingPage = ({ onEnter }: { onEnter: () => void }) => {
               </p>
               <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
                 <button 
-                  onClick={onEnter}
+                  onClick={() => setView('register')}
                   className="cta-gradient text-white px-8 md:px-10 py-4 md:py-5 rounded-xl font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl shadow-blue-500/40 hover:scale-105 transition-all active:scale-95 cursor-pointer"
                 >
-                  Entrar a la Terminal
+                  Comenzar Ahora
                 </button>
-                <button className="px-8 md:px-10 py-4 md:py-5 rounded-xl font-black text-xs md:text-sm uppercase tracking-widest border-2 border-outline-variant/20 hover:bg-surface-container transition-all cursor-pointer">
-                  Saber Más
+                <button 
+                  onClick={() => setView('login')}
+                  className="px-8 md:px-10 py-4 md:py-5 rounded-xl font-black text-xs md:text-sm uppercase tracking-widest border-2 border-outline-variant/20 hover:bg-surface-container transition-all cursor-pointer"
+                >
+                  Acceder
                 </button>
               </div>
             </motion.div>
@@ -1100,13 +1207,15 @@ const RecentActivity = ({ language }: { language: 'es' | 'en' }) => {
   );
 };
 
-const UserManagement = ({ company, onBack, language }: { company: any, onBack: () => void, language: 'es' | 'en' }) => {
+const UserManagement = ({ company, onBack, language, userRole }: { company: any, onBack: () => void, language: 'es' | 'en', userRole: string }) => {
   const t = TRANSLATIONS[language];
   const [users, setUsers] = useState([
     { id: 1, name: 'Carlos Rodriguez', email: 'c.rodriguez@aurum.ch', role: t.admin, status: t.active, lastAccess: 'Hace 2 horas' },
     { id: 2, name: 'Elena Schmidt', email: 'e.schmidt@aurum.ch', role: t.operator, status: t.active, lastAccess: 'Hoy, 09:15 AM' },
     { id: 3, name: 'Hans Müller', email: 'h.mueller@aurum.ch', role: t.viewer, status: t.inactive, lastAccess: 'Hace 3 días' },
   ]);
+
+  const canAddUser = userRole === 'admin';
 
   return (
     <div className="space-y-8">
@@ -1138,10 +1247,17 @@ const UserManagement = ({ company, onBack, language }: { company: any, onBack: (
             <span className="text-xs font-bold text-on-surface-variant">{t.admin}s</span>
           </div>
         </div>
-        <button className="bg-primary text-white p-6 rounded-xl shadow-xl flex flex-col justify-center items-center gap-2 hover:opacity-90 transition-opacity">
-          <Plus className="w-6 h-6" />
-          <span className="text-xs font-black uppercase tracking-widest">{t.addUser}</span>
-        </button>
+        {canAddUser ? (
+          <button className="bg-primary text-white p-6 rounded-xl shadow-xl flex flex-col justify-center items-center gap-2 hover:opacity-90 transition-opacity">
+            <Plus className="w-6 h-6" />
+            <span className="text-xs font-black uppercase tracking-widest">{t.addUser}</span>
+          </button>
+        ) : (
+          <div className="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10 flex flex-col justify-center items-center gap-2 opacity-50 grayscale">
+            <Lock className="w-6 h-6 text-outline" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-outline">{t.insufficientPermissions}</span>
+          </div>
+        )}
       </div>
 
       <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/10 shadow-sm overflow-hidden">
@@ -1195,24 +1311,28 @@ const UserManagement = ({ company, onBack, language }: { company: any, onBack: (
   );
 };
 
-const CompanyManagement = ({ language, currency }: { language: 'es' | 'en', currency: string }) => {
+const CompanyManagement = ({ language, currency, userRole }: { language: 'es' | 'en', currency: string, userRole: string }) => {
   const t = TRANSLATIONS[language];
   const [filter, setFilter] = useState('Todos');
-  const [sectorFilter, setSectorFilter] = useState('Todos');
+  const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState<any>(null);
   const [newCompany, setNewCompany] = useState({ name: '', email: '', sector: 'Metales' });
 
+  const sectors = [t.metals, t.energy, t.agriculture, 'Logística'];
+
   const [companies, setCompanies] = useState([
-    { id: 'CORP-2948-B', name: 'Aurum Metals SA', country: 'Suiza', code: 'CHE-101.928.374', access: 'TIER 1', status: 'VERIFICADO', activity: 'Hoy, 10:45 AM', trade: 'XAU/USD', sector: 'Metales' },
-    { id: 'CORP-1122-E', name: 'Blue Energy Global', country: 'Noruega', code: 'NO-983210452', access: 'TIER 2', status: 'KYC PENDIENTE', activity: 'Ayer, 16:20 PM', trade: 'Carga de Documentos', sector: 'Energía' },
-    { id: 'CORP-5582-A', name: 'AgroTrading Int.', country: 'Argentina', code: 'AR-30-708293-1', access: 'TIER 1', status: 'VERIFICADO', activity: '12 Oct, 09:15 AM', trade: 'Corn Futures', sector: 'Agrícolas' },
-    { id: 'CORP-0041-Z', name: 'Lux Trading Ltd', country: 'Reino Unido', code: 'UK-SC294811', access: 'TIER 1', status: 'RECHAZADO', activity: '05 Oct, 14:00 PM', trade: 'Fallo en Compliance', sector: 'Metales' },
+    { id: 'CORP-2948-B', name: 'Aurum Metals SA', country: 'Suiza', code: 'CHE-101.928.374', access: 'TIER 1', status: 'VERIFICADO', activity: 'Hoy, 10:45 AM', trade: 'XAU/USD', sector: t.metals },
+    { id: 'CORP-1122-E', name: 'Blue Energy Global', country: 'Noruega', code: 'NO-983210452', access: 'TIER 2', status: 'KYC PENDIENTE', activity: 'Ayer, 16:20 PM', trade: 'Carga de Documentos', sector: t.energy },
+    { id: 'CORP-5582-A', name: 'AgroTrading Int.', country: 'Argentina', code: 'AR-30-708293-1', access: 'TIER 1', status: 'VERIFICADO', activity: '12 Oct, 09:15 AM', trade: 'Corn Futures', sector: t.agriculture },
+    { id: 'CORP-0041-Z', name: 'Lux Trading Ltd', country: 'Reino Unido', code: 'UK-SC294811', access: 'TIER 1', status: 'RECHAZADO', activity: '05 Oct, 14:00 PM', trade: 'Fallo en Compliance', sector: t.metals },
   ]);
 
   if (selectedCompany) {
-    return <UserManagement company={selectedCompany} onBack={() => setSelectedCompany(null)} language={language} />;
+    return <UserManagement company={selectedCompany} onBack={() => setSelectedCompany(null)} language={language} userRole={userRole} />;
   }
+
+  const canInvite = userRole === 'admin' || userRole === 'operator';
 
   const handleInvite = () => {
     if (!newCompany.name || !newCompany.email) return;
@@ -1231,13 +1351,21 @@ const CompanyManagement = ({ language, currency }: { language: 'es' | 'en', curr
     };
     
     setCompanies([company, ...companies]);
-    setNewCompany({ name: '', email: '', sector: 'Metales' });
+    setNewCompany({ name: '', email: '', sector: t.metals });
     setShowInviteModal(false);
+  };
+
+  const toggleSector = (sector: string) => {
+    setSelectedSectors(prev => 
+      prev.includes(sector) 
+        ? prev.filter(s => s !== sector) 
+        : [...prev, sector]
+    );
   };
 
   const filteredCompanies = companies.filter(c => {
     const statusMatch = filter === 'Todos' || c.status === filter;
-    const sectorMatch = sectorFilter === 'Todos' || c.sector === sectorFilter;
+    const sectorMatch = selectedSectors.length === 0 || selectedSectors.includes(c.sector);
     return statusMatch && sectorMatch;
   });
 
@@ -1248,13 +1376,15 @@ const CompanyManagement = ({ language, currency }: { language: 'es' | 'en', curr
           <h2 className="text-3xl font-extrabold text-primary tracking-tighter font-headline">{t.manageCompanies}</h2>
           <p className="text-on-surface-variant text-sm mt-1">Supervise el ecosistema de instituciones y verifique su estado normativo.</p>
         </div>
-        <button 
-          onClick={() => setShowInviteModal(true)}
-          className="w-full sm:w-auto bg-black text-white px-6 py-3 rounded-lg font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
-        >
-          <Plus className="w-4 h-4" />
-          {t.inviteCompany}
-        </button>
+        {canInvite && (
+          <button 
+            onClick={() => setShowInviteModal(true)}
+            className="w-full sm:w-auto bg-black text-white px-6 py-3 rounded-lg font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <Plus className="w-4 h-4" />
+            {t.inviteCompany}
+          </button>
+        )}
       </div>
 
       <AnimatePresence>
@@ -1376,25 +1506,36 @@ const CompanyManagement = ({ language, currency }: { language: 'es' | 'en', curr
 
           <div className="space-y-4">
             <h3 className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant flex items-center gap-2">
-              <Building2 className="w-3 h-3" /> {t.marketSector}
+              <Building2 className="w-3 h-3" /> {t.filterBySectors}
             </h3>
             <div className="space-y-2">
-              {['Todos', 'Metales', 'Energía', 'Agrícolas'].map((s) => (
+              {sectors.map((s) => (
                 <button
                   key={s}
-                  onClick={() => setSectorFilter(s)}
+                  onClick={() => toggleSector(s)}
                   className={cn(
-                    "w-full text-left px-4 py-3 rounded-lg text-xs font-bold transition-all flex items-center gap-3",
-                    sectorFilter === s ? "bg-primary/10 text-primary border border-primary/20" : "text-on-surface-variant hover:bg-surface-container"
+                    "w-full text-left px-4 py-3 rounded-lg text-xs font-bold transition-all flex items-center justify-between",
+                    selectedSectors.includes(s) ? "bg-primary/10 text-primary border border-primary/20" : "text-on-surface-variant hover:bg-surface-container"
                   )}
                 >
-                  {s === 'Metales' && <Gem className="w-4 h-4" />}
-                  {s === 'Energía' && <Fuel className="w-4 h-4" />}
-                  {s === 'Agrícolas' && <ArrowUpDown className="w-4 h-4" />}
-                  {s === 'Todos' && <LayoutDashboard className="w-4 h-4" />}
-                  {s}
+                  <div className="flex items-center gap-3">
+                    {s === t.metals && <Gem className="w-4 h-4" />}
+                    {s === t.energy && <Fuel className="w-4 h-4" />}
+                    {s === t.agriculture && <ArrowUpDown className="w-4 h-4" />}
+                    {s === 'Logística' && <LayoutDashboard className="w-4 h-4" />}
+                    {s}
+                  </div>
+                  {selectedSectors.includes(s) && <Check className="w-4 h-4" />}
                 </button>
               ))}
+              {selectedSectors.length > 0 && (
+                <button 
+                  onClick={() => setSelectedSectors([])}
+                  className="w-full text-center py-2 text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
+                >
+                  Limpiar Filtros
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1677,13 +1818,25 @@ const Dashboard = ({ onNewMatch, selectedCategory, onManageCompanies, language, 
   );
 };
 
-const NegotiationDetail = () => {
+const NegotiationDetail = ({ language, userRole }: { language: 'es' | 'en', userRole: string }) => {
+  const t = TRANSLATIONS[language];
   const [documents, setDocuments] = useState([
     { id: 1, name: 'LOI - Letter of Intent', status: 'APROBADA', ref: 'LOI-4920-CHILE-COPPER.pdf', size: '2.4 MB', date: 'Hace 2 días', type: 'approved' },
     { id: 2, name: 'FCO - Full Corporate Offer', status: 'PENDIENTE ACCIÓN', ref: 'FCO_COPPER_FINAL.pdf', size: '1.8 MB', date: 'Hoy, 09:15 GMT', type: 'pending' },
   ]);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [auditLog, setAuditLog] = useState([
+    { title: 'Firma Digital Detectada', desc: 'Vendedor #0988 ha firmado electrónicamente la FCO.', time: 'HOY, 14:22 GMT', color: 'bg-on-tertiary-container' },
+    { title: 'Documento Subido', desc: 'Vendedor #0988 cargó FCO_COPPER_FINAL.pdf', time: 'AYER, 09:15 GMT', color: 'bg-outline-variant' },
+    { title: 'Compliance Aprobado', desc: 'Mesa Central de Compliance verificó LOI.', time: '20 OCT, 11:30 GMT', color: 'bg-green-500' },
+  ]);
+  const [showProposalModal, setShowProposalModal] = useState(false);
+  const [proposalData, setProposalData] = useState({ price: '', quantity: '', notes: '' });
+
+  const canNegotiate = userRole === 'admin' || userRole === 'operator';
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!canNegotiate) return;
     const file = e.target.files?.[0];
     if (file) {
       const newDoc = {
@@ -1696,11 +1849,100 @@ const NegotiationDetail = () => {
         type: 'review'
       };
       setDocuments([newDoc, ...documents]);
+      setAuditLog([{
+        title: 'Documento Cargado',
+        desc: `Se ha subido el documento: ${file.name}`,
+        time: 'AHORA',
+        color: 'bg-blue-500'
+      }, ...auditLog]);
     }
+  };
+
+  const handleRequestVideo = () => {
+    setStatusMessage(t.videoConfRequested);
+    setAuditLog([{
+      title: 'Videoconferencia Solicitada',
+      desc: 'Se ha enviado una solicitud de reunión virtual a la contraparte.',
+      time: 'AHORA',
+      color: 'bg-on-tertiary-container'
+    }, ...auditLog]);
+    setTimeout(() => setStatusMessage(null), 3000);
+  };
+
+  const handleSendProposal = () => {
+    setShowProposalModal(true);
+  };
+
+  const submitProposal = (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatusMessage(t.proposalSent);
+    setAuditLog([{
+      title: 'Propuesta Enviada',
+      desc: `Nueva propuesta SPA enviada: ${proposalData.quantity} MT @ ${proposalData.price}`,
+      time: 'AHORA',
+      color: 'bg-primary'
+    }, ...auditLog]);
+    setShowProposalModal(false);
+    setProposalData({ price: '', quantity: '', notes: '' });
+    setTimeout(() => setStatusMessage(null), 3000);
   };
 
   return (
     <div className="space-y-8">
+      {showProposalModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-surface-container-lowest w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-outline-variant/20"
+          >
+            <div className="p-6 border-b border-outline-variant/20 flex justify-between items-center bg-primary text-white">
+              <h3 className="text-lg font-black uppercase tracking-widest font-headline">Enviar Propuesta SPA</h3>
+              <button onClick={() => setShowProposalModal(false)}><X className="w-5 h-5" /></button>
+            </div>
+            <form onSubmit={submitProposal} className="p-6 space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1">Precio Ofertado (USD/MT)</label>
+                <input 
+                  required
+                  type="number" 
+                  value={proposalData.price}
+                  onChange={e => setProposalData({...proposalData, price: e.target.value})}
+                  className="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary"
+                  placeholder="Ej: 9250"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1">Cantidad (MT)</label>
+                <input 
+                  required
+                  type="number" 
+                  value={proposalData.quantity}
+                  onChange={e => setProposalData({...proposalData, quantity: e.target.value})}
+                  className="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary"
+                  placeholder="Ej: 5000"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-1">Notas Adicionales</label>
+                <textarea 
+                  value={proposalData.notes}
+                  onChange={e => setProposalData({...proposalData, notes: e.target.value})}
+                  className="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-primary h-24 resize-none"
+                  placeholder="Términos de pago, logística, etc..."
+                />
+              </div>
+              <button 
+                type="submit"
+                className="w-full py-3 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-lg shadow-xl shadow-primary/20 active:scale-[0.98] transition-all"
+              >
+                Confirmar y Enviar
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
       <div className="flex justify-between items-end">
         <div>
           <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-on-surface-variant mb-2 font-headline">
@@ -1713,6 +1955,18 @@ const NegotiationDetail = () => {
           <h2 className="text-3xl font-extrabold text-primary tracking-tighter font-headline">Sala de Negociación: Cobre Catódico Grado A</h2>
         </div>
         <div className="flex items-center gap-3">
+          <AnimatePresence>
+            {statusMessage && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="bg-on-tertiary-container text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg"
+              >
+                {statusMessage}
+              </motion.div>
+            )}
+          </AnimatePresence>
           <span className="px-3 py-1 bg-on-tertiary-container/10 text-on-tertiary-container text-[10px] font-black uppercase tracking-widest rounded-full border border-on-tertiary-container/20">
             Estado: NEGOCIACIÓN
           </span>
@@ -1827,11 +2081,7 @@ const NegotiationDetail = () => {
             </div>
             <div className="space-y-6 flex-1 relative">
               <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-outline-variant/30"></div>
-              {[
-                { title: 'Firma Digital Detectada', desc: 'Vendedor #0988 ha firmado electrónicamente la FCO.', time: 'HOY, 14:22 GMT', color: 'bg-on-tertiary-container' },
-                { title: 'Documento Subido', desc: 'Vendedor #0988 cargó FCO_COPPER_FINAL.pdf', time: 'AYER, 09:15 GMT', color: 'bg-outline-variant' },
-                { title: 'Compliance Aprobado', desc: 'Mesa Central de Compliance verificó LOI.', time: '20 OCT, 11:30 GMT', color: 'bg-green-500' },
-              ].map((item, i) => (
+              {auditLog.map((item, i) => (
                 <div key={i} className="relative pl-10">
                   <div className={cn("absolute left-1.5 top-1.5 w-3 h-3 rounded-full border-2 border-surface-container-low", item.color)}></div>
                   <p className="text-[11px] font-bold">{item.title}</p>
@@ -1870,11 +2120,19 @@ const NegotiationDetail = () => {
           </div>
         </div>
         <div className="flex gap-4">
-          <button className="px-8 py-3 bg-surface-container-high text-on-surface text-xs font-black uppercase tracking-widest rounded transition-all hover:bg-surface-container-highest">
-            Solicitar Videoconferencia
+          <button 
+            onClick={handleRequestVideo}
+            disabled={!canNegotiate}
+            className="px-8 py-3 bg-surface-container-high text-on-surface text-xs font-black uppercase tracking-widest rounded transition-all hover:bg-surface-container-highest disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {t.requestVideoConf}
           </button>
-          <button className="px-8 py-3 bg-primary text-white text-xs font-black uppercase tracking-widest rounded shadow-xl shadow-black/10 active:scale-95 transition-all">
-            Enviar Propuesta SPA
+          <button 
+            onClick={handleSendProposal}
+            disabled={!canNegotiate}
+            className="px-8 py-3 bg-primary text-white text-xs font-black uppercase tracking-widest rounded shadow-xl shadow-black/10 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {t.sendProposal}
           </button>
         </div>
       </div>
@@ -2079,7 +2337,7 @@ const Markets = ({ selectedCategory, language, currency }: { selectedCategory: s
                       <h4 className="text-[10px] font-black text-primary uppercase tracking-widest border-b border-outline-variant/10 pb-2 flex items-center gap-2">
                         <Activity className="w-3 h-3" /> Insights de IA
                       </h4>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10 space-y-4">
                         <div className="p-4 bg-green-50 rounded-xl border border-green-100">
                           <p className="text-[9px] font-bold text-green-700 uppercase tracking-widest mb-1">Señal de Compra</p>
                           <p className="text-xs font-medium text-green-800 leading-relaxed">Fuerte soporte detectado en niveles actuales. La demanda industrial se mantiene sólida.</p>
@@ -2182,35 +2440,70 @@ const Markets = ({ selectedCategory, language, currency }: { selectedCategory: s
   );
 };
 
-const Settlements = ({ language, currency }: { language: 'es' | 'en', currency: string }) => {
+const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', currency: string, userRole: string }) => {
   const t = TRANSLATIONS[language];
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [selectedSettlement, setSelectedSettlement] = useState<any>(null);
+  const [settlements, setSettlements] = useState([
+    { id: 'SET-9012', client: 'REFI-44', amount: 842000, status: 'Completado', date: '2026-03-24', type: 'Pago', bank: 'Chase Manhattan', ref: 'TXN-0019283', fee: 1200, method: 'SWIFT', docs: [{ name: 'Invoice_9012.pdf', date: '2026-03-24' }] },
+    { id: 'SET-9013', client: 'MINE-014', amount: 1240000, status: 'Pendiente', date: '2026-03-26', type: 'Cobro', bank: 'HSBC London', ref: 'TXN-0019284', fee: 2500, method: 'Wire Transfer', docs: [] },
+    { id: 'SET-9014', client: 'FOOD-08', amount: 415500, status: 'En Proceso', date: '2026-03-25', type: 'Pago', bank: 'Santander Madrid', ref: 'TXN-0019285', fee: 850, method: 'SEPA', docs: [] },
+    { id: 'SET-9015', client: 'AGRO-42', amount: 124000, status: 'Completado', date: '2026-03-22', type: 'Cobro', bank: 'Rabobank NL', ref: 'TXN-0019286', fee: 400, method: 'Wire Transfer', docs: [] },
+    { id: 'SET-9016', client: 'TRAD-99', amount: 560000, status: 'Completado', date: '2026-03-21', type: 'Pago', bank: 'Standard Chartered', ref: 'TXN-0019287', fee: 1100, method: 'SWIFT', docs: [] },
+    { id: 'SET-9017', client: 'INST-772', amount: 2100000, status: 'Pendiente', date: '2026-03-27', type: 'Cobro', bank: 'Goldman Sachs', ref: 'TXN-0019288', fee: 4200, method: 'Wire Transfer', docs: [] },
+    { id: 'SET-9018', client: 'REFI-44', amount: 320000, status: 'Completado', date: '2026-03-20', type: 'Pago', bank: 'Chase Manhattan', ref: 'TXN-0019289', fee: 650, method: 'SWIFT', docs: [] },
+    { id: 'SET-9019', client: 'MINE-014', amount: 980000, status: 'En Proceso', date: '2026-03-26', type: 'Cobro', bank: 'HSBC London', ref: 'TXN-0019290', fee: 1950, method: 'Wire Transfer', docs: [] },
+    { id: 'SET-9020', client: 'FOOD-08', amount: 150000, status: 'Completado', date: '2026-03-19', type: 'Pago', bank: 'Santander Madrid', ref: 'TXN-0019291', fee: 300, method: 'SEPA', docs: [] },
+    { id: 'SET-9021', client: 'AGRO-42', amount: 75000, status: 'Pendiente', date: '2026-03-28', type: 'Cobro', bank: 'Rabobank NL', ref: 'TXN-0019292', fee: 150, method: 'Wire Transfer', docs: [] },
+  ]);
   const itemsPerPage = 5;
 
-  const initialSettlements = [
-    { id: 'SET-9012', client: 'REFI-44', amount: 842000, status: t.completed, date: '2026-03-24', type: t.payment, bank: 'Chase Manhattan', ref: 'TXN-0019283', fee: formatCurrency(1200, currency), method: 'SWIFT' },
-    { id: 'SET-9013', client: 'MINE-014', amount: 1240000, status: t.pending, date: '2026-03-26', type: t.collection, bank: 'HSBC London', ref: 'TXN-0019284', fee: formatCurrency(2500, currency), method: 'Wire Transfer' },
-    { id: 'SET-9014', client: 'FOOD-08', amount: 415500, status: t.inProcess, date: '2026-03-25', type: t.payment, bank: 'Santander Madrid', ref: 'TXN-0019285', fee: formatCurrency(850, currency), method: 'SEPA' },
-    { id: 'SET-9015', client: 'AGRO-42', amount: 124000, status: t.completed, date: '2026-03-22', type: t.collection, bank: 'Rabobank NL', ref: 'TXN-0019286', fee: formatCurrency(400, currency), method: 'Wire Transfer' },
-    { id: 'SET-9016', client: 'TRAD-99', amount: 560000, status: t.completed, date: '2026-03-21', type: t.payment, bank: 'Standard Chartered', ref: 'TXN-0019287', fee: formatCurrency(1100, currency), method: 'SWIFT' },
-    { id: 'SET-9017', client: 'INST-772', amount: 2100000, status: t.pending, date: '2026-03-27', type: t.collection, bank: 'Goldman Sachs', ref: 'TXN-0019288', fee: formatCurrency(4200, currency), method: 'Wire Transfer' },
-    { id: 'SET-9018', client: 'REFI-44', amount: 320000, status: t.completed, date: '2026-03-20', type: t.payment, bank: 'Chase Manhattan', ref: 'TXN-0019289', fee: formatCurrency(650, currency), method: 'SWIFT' },
-    { id: 'SET-9019', client: 'MINE-014', amount: 980000, status: t.inProcess, date: '2026-03-26', type: t.collection, bank: 'HSBC London', ref: 'TXN-0019290', fee: formatCurrency(1950, currency), method: 'Wire Transfer' },
-    { id: 'SET-9020', client: 'FOOD-08', amount: 150000, status: t.completed, date: '2026-03-19', type: t.payment, bank: 'Santander Madrid', ref: 'TXN-0019291', fee: formatCurrency(300, currency), method: 'SEPA' },
-    { id: 'SET-9021', client: 'AGRO-42', amount: 75000, status: t.pending, date: '2026-03-28', type: t.collection, bank: 'Rabobank NL', ref: 'TXN-0019292', fee: formatCurrency(150, currency), method: 'Wire Transfer' },
-  ];
+  const filteredSettlements = settlements.filter(item => {
+    const matchesDate = (() => {
+      if (!startDate && !endDate) return true;
+      const itemDate = new Date(item.date);
+      if (startDate && itemDate < new Date(startDate)) return false;
+      if (endDate && itemDate > new Date(endDate)) return false;
+      return true;
+    })();
 
-  const filteredSettlements = initialSettlements.filter(item => {
-    if (!startDate && !endDate) return true;
-    const itemDate = new Date(item.date);
-    if (startDate && itemDate < new Date(startDate)) return false;
-    if (endDate && itemDate > new Date(endDate)) return false;
-    return true;
+    const matchesSearch = searchQuery === '' || 
+      item.ref.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      item.bank.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesType = typeFilter === 'all' || item.type === (typeFilter === 'payment' ? 'Pago' : 'Cobro');
+    const matchesStatus = statusFilter === 'all' || item.status === (statusFilter === 'completed' ? 'Completado' : statusFilter === 'pending' ? 'Pendiente' : 'En Proceso');
+
+    return matchesDate && matchesSearch && matchesType && matchesStatus;
   });
+
+  const handleFileUpload = (settlementId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSettlements(prev => prev.map(s => {
+        if (s.id === settlementId) {
+          return {
+            ...s,
+            docs: [...s.docs, { name: file.name, date: new Date().toISOString().split('T')[0] }]
+          };
+        }
+        return s;
+      }));
+      // Update selected settlement if it's the one being modified
+      if (selectedSettlement?.id === settlementId) {
+        setSelectedSettlement((prev: any) => ({
+          ...prev,
+          docs: [...prev.docs, { name: file.name, date: new Date().toISOString().split('T')[0] }]
+        }));
+      }
+    }
+  };
 
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
@@ -2249,6 +2542,41 @@ const Settlements = ({ language, currency }: { language: 'es' | 'en', currency: 
           <p className="text-on-surface-variant text-sm mt-1">{t.consolidatedView}</p>
         </div>
         <div className="flex flex-wrap gap-3 w-full md:w-auto">
+          <div className="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg border border-outline-variant/10">
+            <Filter className="w-4 h-4 text-outline" />
+            <select 
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="bg-transparent text-[10px] font-bold uppercase tracking-widest focus:outline-none"
+            >
+              <option value="all">{t.all} ({t.type})</option>
+              <option value="payment">{t.payment}</option>
+              <option value="collection">{t.collection}</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg border border-outline-variant/10">
+            <Activity className="w-4 h-4 text-outline" />
+            <select 
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="bg-transparent text-[10px] font-bold uppercase tracking-widest focus:outline-none"
+            >
+              <option value="all">{t.all} ({t.status})</option>
+              <option value="completed">{t.completed}</option>
+              <option value="pending">{t.pending}</option>
+              <option value="inProcess">{t.inProcess}</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg border border-outline-variant/10 flex-1 md:flex-none">
+            <Search className="w-4 h-4 text-outline" />
+            <input 
+              type="text" 
+              placeholder={t.searchByRefOrBank}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-transparent text-[10px] font-bold uppercase tracking-widest focus:outline-none w-full md:w-48"
+            />
+          </div>
           <div className="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg border border-outline-variant/10">
             <Calendar className="w-4 h-4 text-outline" />
             <input 
@@ -2466,6 +2794,44 @@ const Settlements = ({ language, currency }: { language: 'es' | 'en', currency: 
                   </div>
                 </div>
 
+                <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/10 space-y-4">
+                  <div className="flex justify-between items-center border-b border-outline-variant/10 pb-2">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                      <FileText className="w-3 h-3" /> {t.associatedDocuments}
+                    </h4>
+                    {userRole !== 'viewer' && (
+                      <label className="text-[9px] font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
+                        <Plus className="w-3 h-3" /> {t.uploadDocument}
+                        <input 
+                          type="file" 
+                          className="hidden" 
+                          onChange={(e) => handleFileUpload(selectedSettlement.id, e)}
+                        />
+                      </label>
+                    )}
+                  </div>
+                  <div className="space-y-2 max-h-32 overflow-y-auto pr-2">
+                    {selectedSettlement.docs && selectedSettlement.docs.length > 0 ? (
+                      selectedSettlement.docs.map((doc: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between p-2 bg-surface-container-lowest rounded border border-outline-variant/5 group">
+                          <div className="flex items-center gap-2">
+                            <File className="w-3 h-3 text-outline" />
+                            <span className="text-[10px] font-medium truncate max-w-[150px]">{doc.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[8px] text-outline">{doc.date}</span>
+                            <button className="p-1 hover:bg-surface-container rounded transition-colors">
+                              <Download className="w-3 h-3 text-primary" />
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-[10px] text-outline italic text-center py-2">{t.noDocuments}</p>
+                    )}
+                  </div>
+                </div>
+
                 <div className="space-y-4">
                   <h4 className="text-[10px] font-black text-primary uppercase tracking-widest border-b border-outline-variant/10 pb-2">{t.bankDetails}</h4>
                   <div className="grid grid-cols-2 gap-6">
@@ -2594,13 +2960,52 @@ const Reports = ({ language }: { language: 'es' | 'en' }) => {
   );
 };
 
-const SettingsView = ({ language }: { language: 'es' | 'en' }) => {
+const SettingsView = ({ language, userRole, setUserRole }: { language: 'es' | 'en', userRole: string, setUserRole: (role: any) => void }) => {
   const t = TRANSLATIONS[language];
+  const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const handlePasswordChange = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwords.new !== passwords.confirm) return;
+    setShowSuccess(true);
+    setPasswords({ current: '', new: '', confirm: '' });
+    setTimeout(() => setShowSuccess(false), 3000);
+  };
+
   return (
     <div className="space-y-8 max-w-4xl">
-      <div>
-        <h2 className="text-3xl font-extrabold text-primary tracking-tighter font-headline">{t.systemSettings}</h2>
-        <p className="text-on-surface-variant text-sm mt-1">{t.manageProfileDesc}</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-extrabold text-primary tracking-tighter font-headline">{t.systemSettings}</h2>
+          <p className="text-on-surface-variant text-sm mt-1">{t.manageProfileDesc}</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg border border-outline-variant/10">
+            <Shield className="w-4 h-4 text-primary" />
+            <select 
+              value={userRole}
+              onChange={(e) => setUserRole(e.target.value as any)}
+              className="bg-transparent text-[10px] font-black uppercase tracking-widest focus:outline-none"
+            >
+              <option value="admin">{t.adminRole}</option>
+              <option value="operator">{t.operatorRole}</option>
+              <option value="viewer">{t.viewerRole}</option>
+            </select>
+          </div>
+          <AnimatePresence>
+            {showSuccess && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="bg-green-500 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg"
+              >
+                {t.passwordChanged}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -2661,23 +3066,61 @@ const SettingsView = ({ language }: { language: 'es' | 'en' }) => {
 
         <section className="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/10 shadow-sm">
           <h3 className="text-sm font-black uppercase tracking-widest text-on-surface-variant mb-6">{t.securityAndAccess}</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-lg">
-              <div>
-                <p className="text-sm font-bold">{t.twoFactorAuth}</p>
-                <p className="text-[10px] text-on-surface-variant">Añade una capa extra de seguridad a tu cuenta.</p>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Contraseña Actual</label>
+                <input 
+                  type="password" 
+                  value={passwords.current}
+                  onChange={(e) => setPasswords({...passwords, current: e.target.value})}
+                  className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors" 
+                />
               </div>
-              <div className="w-12 h-6 bg-primary rounded-full relative cursor-pointer">
-                <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{t.newPassword}</label>
+                <input 
+                  type="password" 
+                  value={passwords.new}
+                  onChange={(e) => setPasswords({...passwords, new: e.target.value})}
+                  className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors" 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{t.confirmPassword}</label>
+                <input 
+                  type="password" 
+                  value={passwords.confirm}
+                  onChange={(e) => setPasswords({...passwords, confirm: e.target.value})}
+                  className="w-full bg-surface-container-low border border-outline-variant/20 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors" 
+                />
               </div>
             </div>
-            <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-lg">
-              <div>
-                <p className="text-sm font-bold">Notificaciones de Inicio de Sesión</p>
-                <p className="text-[10px] text-on-surface-variant">Recibe un correo cada vez que se acceda a tu cuenta.</p>
+            <button 
+              onClick={handlePasswordChange}
+              className="px-6 py-2 bg-surface-container-high text-primary rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all shadow-sm"
+            >
+              Actualizar Contraseña
+            </button>
+
+            <div className="pt-6 border-t border-outline-variant/10 space-y-4">
+              <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-lg">
+                <div>
+                  <p className="text-sm font-bold">{t.twoFactorAuth}</p>
+                  <p className="text-[10px] text-on-surface-variant">Añade una capa extra de seguridad a tu cuenta.</p>
+                </div>
+                <div className="w-12 h-6 bg-primary rounded-full relative cursor-pointer">
+                  <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+                </div>
               </div>
-              <div className="w-12 h-6 bg-outline-variant/30 rounded-full relative cursor-pointer">
-                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+              <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-lg">
+                <div>
+                  <p className="text-sm font-bold">Notificaciones de Inicio de Sesión</p>
+                  <p className="text-[10px] text-on-surface-variant">Recibe un correo cada vez que se acceda a tu cuenta.</p>
+                </div>
+                <div className="w-12 h-6 bg-outline-variant/30 rounded-full relative cursor-pointer">
+                  <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -2705,6 +3148,7 @@ export default function App() {
   const [currency, setCurrency] = useState('USD');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [userRole, setUserRole] = useState<'admin' | 'operator' | 'viewer'>('admin');
 
   const t = TRANSLATIONS[language];
 
@@ -2817,7 +3261,7 @@ export default function App() {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.4 }}
                     >
-                      <CompanyManagement language={language} currency={currency} />
+                      <CompanyManagement language={language} currency={currency} userRole={userRole} />
                     </motion.div>
                   )}
                   {activeTab === 'markets' && (
@@ -2839,7 +3283,7 @@ export default function App() {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.4 }}
                     >
-                      <NegotiationDetail />
+                      <NegotiationDetail language={language} userRole={userRole} />
                     </motion.div>
                   )}
                   {activeTab === 'settlements' && (
@@ -2850,7 +3294,7 @@ export default function App() {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.4 }}
                     >
-                      <Settlements language={language} currency={currency} />
+                      <Settlements language={language} currency={currency} userRole={userRole} />
                     </motion.div>
                   )}
                   {activeTab === 'reports' && (
@@ -2872,7 +3316,7 @@ export default function App() {
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.4 }}
                     >
-                      <SettingsView language={language} />
+                      <SettingsView language={language} userRole={userRole} setUserRole={setUserRole} />
                     </motion.div>
                   )}
                   {activeTab !== 'dashboard' && activeTab !== 'markets' && activeTab !== 'operations' && activeTab !== 'settlements' && activeTab !== 'reports' && activeTab !== 'settings' && (
