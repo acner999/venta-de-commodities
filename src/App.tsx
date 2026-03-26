@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   LayoutDashboard, 
   ArrowLeftRight, 
@@ -150,6 +150,7 @@ const TRANSLATIONS = {
     markAsRead: "Marcar como leído",
     security: "Seguridad",
     saveChanges: "Guardar Cambios",
+    creditRating: "Calificación Crediticia",
     totalTradedVolume: "Volumen Total Negociado",
     vsLastMonth: "vs. mes anterior",
     closedOperations: "Operaciones Cerradas",
@@ -246,6 +247,7 @@ const TRANSLATIONS = {
     newNotification: "Nueva Notificación",
     incomingPayments: "Pagos Entrantes",
     outgoingPayments: "Pagos Salientes",
+    matchedTotal: "Total Pagos Emparejados",
     flagDiscrepancy: "Marcar Discrepancia",
     confirmReconciliation: "Confirmar Conciliación",
     changeSelection: "Cambiar Selección",
@@ -328,6 +330,7 @@ const TRANSLATIONS = {
     markAsRead: "Mark as read",
     security: "Security",
     saveChanges: "Save Changes",
+    creditRating: "Credit Rating",
     totalTradedVolume: "Total Traded Volume",
     vsLastMonth: "vs. last month",
     closedOperations: "Closed Operations",
@@ -424,8 +427,9 @@ const TRANSLATIONS = {
     newNotification: "New Notification",
     incomingPayments: "Incoming Payments",
     outgoingPayments: "Outgoing Payments",
+    matchedTotal: "Total Matched Payments",
     flagDiscrepancy: "Flag Discrepancy",
-    confirmReconciliation: "Confirmar Reconciliation",
+    confirmReconciliation: "Confirm Reconciliation",
     changeSelection: "Change Selection",
     expectedAmount: "Expected Amount",
     perfectReconciliation: "Perfect Reconciliation",
@@ -940,8 +944,19 @@ const TopBar = ({
               setShowSearchResults(true);
             }}
             onFocus={() => setShowSearchResults(true)}
-            className="w-full bg-surface-container-low border border-outline-variant/20 rounded-2xl pl-12 pr-4 py-2 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
+            className="w-full bg-surface-container-low border border-outline-variant/20 rounded-2xl pl-12 pr-10 py-2 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
           />
+          {searchQuery && (
+            <button 
+              onClick={() => {
+                setSearchQuery('');
+                setShowSearchResults(false);
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-surface-container-high rounded-full text-outline hover:text-primary transition-all"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          )}
           
           {/* Search Results Dropdown */}
           <AnimatePresence>
@@ -1164,7 +1179,7 @@ const KPICard = ({ title, value, change, label, icon: Icon, colorClass }: any) =
   </div>
 );
 
-const MatchCard = ({ category, id, title, buyer, seller, amount, status, colorClass }: any) => {
+const MatchCard = ({ category, id, title, buyer, seller, amount, status, colorClass, matchScore, buyerRating, sellerRating }: any) => {
   const [actionTaken, setActionTaken] = useState<string | null>(null);
   const [confirmingAction, setConfirmingAction] = useState<string | null>(null);
 
@@ -1199,6 +1214,29 @@ const MatchCard = ({ category, id, title, buyer, seller, amount, status, colorCl
       }}
       className="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow cursor-pointer group relative overflow-hidden"
     >
+      {matchScore && (
+        <div className="absolute top-0 right-0 flex flex-col items-end">
+          <div className={cn(
+            "px-2 py-0.5 text-[8px] font-black rounded-bl-lg border-b border-l",
+            matchScore > 85 ? "bg-green-500/10 text-green-600 border-green-500/10" : 
+            matchScore > 70 ? "bg-primary/10 text-primary border-primary/10" : "bg-orange-500/10 text-orange-600 border-orange-500/10"
+          )}>
+            MATCH: {matchScore}%
+          </div>
+          {buyerRating && (
+            <div className="px-2 py-1 flex gap-1 items-center">
+              <span className={cn(
+                "px-1 rounded-[2px] text-[6px] font-black",
+                buyerRating === 'AAA' ? "bg-green-100 text-green-700" : "bg-surface-container-high text-on-surface-variant"
+              )}>B: {buyerRating}</span>
+              <span className={cn(
+                "px-1 rounded-[2px] text-[6px] font-black",
+                sellerRating === 'AAA' ? "bg-green-100 text-green-700" : "bg-surface-container-high text-on-surface-variant"
+              )}>S: {sellerRating}</span>
+            </div>
+          )}
+        </div>
+      )}
       <AnimatePresence>
         {actionTaken && (
           <motion.div 
@@ -1437,10 +1475,10 @@ const CompanyManagement = ({ language, currency, userRole }: { language: 'es' | 
   const sectors = [t.metals, t.energy, t.agriculture, 'Logística'];
 
   const [companies, setCompanies] = useState([
-    { id: 'CORP-2948-B', name: 'Aurum Metals SA', country: 'Suiza', code: 'CHE-101.928.374', access: 'TIER 1', status: 'VERIFICADO', activity: 'Hoy, 10:45 AM', trade: 'XAU/USD', sector: t.metals },
-    { id: 'CORP-1122-E', name: 'Blue Energy Global', country: 'Noruega', code: 'NO-983210452', access: 'TIER 2', status: 'KYC PENDIENTE', activity: 'Ayer, 16:20 PM', trade: 'Carga de Documentos', sector: t.energy },
-    { id: 'CORP-5582-A', name: 'AgroTrading Int.', country: 'Argentina', code: 'AR-30-708293-1', access: 'TIER 1', status: 'VERIFICADO', activity: '12 Oct, 09:15 AM', trade: 'Corn Futures', sector: t.agriculture },
-    { id: 'CORP-0041-Z', name: 'Lux Trading Ltd', country: 'Reino Unido', code: 'UK-SC294811', access: 'TIER 1', status: 'RECHAZADO', activity: '05 Oct, 14:00 PM', trade: 'Fallo en Compliance', sector: t.metals },
+    { id: 'CORP-2948-B', name: 'Aurum Metals SA', country: 'Suiza', code: 'CHE-101.928.374', access: 'TIER 1', status: 'VERIFICADO', activity: 'Hoy, 10:45 AM', trade: 'XAU/USD', sector: t.metals, creditRating: 'AAA' },
+    { id: 'CORP-1122-E', name: 'Blue Energy Global', country: 'Noruega', code: 'NO-983210452', access: 'TIER 2', status: 'KYC PENDIENTE', activity: 'Ayer, 16:20 PM', trade: 'Carga de Documentos', sector: t.energy, creditRating: 'AA' },
+    { id: 'CORP-5582-A', name: 'AgroTrading Int.', country: 'Argentina', code: 'AR-30-708293-1', access: 'TIER 1', status: 'VERIFICADO', activity: '12 Oct, 09:15 AM', trade: 'Corn Futures', sector: t.agriculture, creditRating: 'A' },
+    { id: 'CORP-0041-Z', name: 'Lux Trading Ltd', country: 'Reino Unido', code: 'UK-SC294811', access: 'TIER 1', status: 'RECHAZADO', activity: '05 Oct, 14:00 PM', trade: 'Fallo en Compliance', sector: t.metals, creditRating: 'BBB' },
   ]);
 
   if (selectedCompany) {
@@ -1663,6 +1701,7 @@ const CompanyManagement = ({ language, currency, userRole }: { language: 'es' | 
                   <tr className="bg-surface-container-low/50">
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">{t.companyName}</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">País / Registro</th>
+                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">{t.creditRating}</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Acceso</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">{t.status}</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Actividad</th>
@@ -1686,6 +1725,16 @@ const CompanyManagement = ({ language, currency, userRole }: { language: 'es' | 
                       <td className="px-6 py-6">
                         <p className="text-sm font-bold text-primary">{c.country}</p>
                         <p className="text-[10px] text-on-surface-variant">{c.code}</p>
+                      </td>
+                      <td className="px-6 py-6">
+                        <span className={cn(
+                          "px-2 py-1 rounded text-[10px] font-black",
+                          c.creditRating === 'AAA' ? "bg-green-50 text-green-700" :
+                          c.creditRating === 'AA' ? "bg-blue-50 text-blue-700" :
+                          c.creditRating === 'A' ? "bg-orange-50 text-orange-700" : "bg-surface-container-high text-on-surface-variant"
+                        )}>
+                          {c.creditRating}
+                        </span>
                       </td>
                       <td className="px-6 py-6">
                         <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-black">{c.access}</span>
@@ -1740,12 +1789,58 @@ const Dashboard = ({ onNewMatch, selectedCategory, onManageCompanies, language, 
   const t = TRANSLATIONS[language];
   const locale = language === 'es' ? 'es-ES' : 'en-US';
   
-  const matches = [
-    { category: t.metals, id: '8492', title: 'Cobre Grado A (Cathode)', buyer: 'INST-772', seller: 'MINE-014', amount: formatCurrency(1240000, currency, locale), colorClass: 'bg-blue-50 text-on-tertiary-container', column: 'PROPUESTO' },
-    { category: t.energy, id: '8510', title: 'Crudo Brent (10k bbl)', buyer: 'REFI-44', seller: 'TRAD-99', amount: formatCurrency(842000, currency, locale), colorClass: 'bg-orange-50 text-orange-600', column: 'PROPUESTO' },
-    { category: t.metals, id: '8492', title: 'Cobre Grado A (Cathode)', buyer: 'INST-772', seller: 'MINE-014', amount: formatCurrency(1240000, currency, locale), status: t.negotiation, colorClass: 'bg-blue-50 text-on-tertiary-container', column: 'NEGOCIACIÓN' },
-    { category: t.agriculture, id: '7721', title: 'Trigo Soft Red Winter', buyer: 'FOOD-08', seller: 'AGRO-42', amount: formatCurrency(415500, currency, locale), status: t.documentation, colorClass: 'bg-green-50 text-green-600', column: 'DOCUMENTACIÓN' },
-  ];
+  // Logic-based Matching Pipeline
+  const [listings] = useState([
+    { id: 'L1', commodity: 'Cobre Grado A', type: 'Venta', quantity: 5000, price: 8200, seller: 'MINE-014', category: t.metals, creditRating: 'AA' },
+    { id: 'L2', commodity: 'Crudo Brent', type: 'Venta', quantity: 10000, price: 84, seller: 'TRAD-99', category: t.energy, creditRating: 'A' },
+    { id: 'L3', commodity: 'Trigo Soft Red', type: 'Venta', quantity: 2500, price: 210, seller: 'AGRO-42', category: t.agriculture, creditRating: 'BBB' },
+  ]);
+
+  const [requests] = useState([
+    { id: 'R1', commodity: 'Cobre Grado A', type: 'Compra', quantity: 4800, price: 8300, buyer: 'INST-772', category: t.metals, creditRating: 'AAA' },
+    { id: 'R2', commodity: 'Crudo Brent', type: 'Compra', quantity: 9500, price: 85, buyer: 'REFI-44', category: t.energy, creditRating: 'AA' },
+    { id: 'R3', commodity: 'Trigo Soft Red', type: 'Compra', quantity: 2600, price: 215, buyer: 'FOOD-08', category: t.agriculture, creditRating: 'A' },
+  ]);
+
+  // Algorithm: Match if same commodity AND quantity within 10% AND price within 5%
+  // New Criterion: Credit Rating compatibility adds to the score
+  const matches = useMemo(() => {
+    const results: any[] = [];
+    const ratingScores: Record<string, number> = { 'AAA': 100, 'AA': 90, 'A': 80, 'BBB': 70 };
+
+    listings.forEach(l => {
+      requests.forEach(r => {
+        if (l.commodity === r.commodity) {
+          const qtyDiff = Math.abs(l.quantity - r.quantity) / l.quantity;
+          const priceDiff = Math.abs(l.price - r.price) / l.price;
+          
+          if (qtyDiff <= 0.15 && priceDiff <= 0.1) { // Slightly wider tolerance for demo
+            const ratingScore = (ratingScores[l.creditRating] + ratingScores[r.creditRating]) / 200;
+            const baseScore = 1 - (qtyDiff + priceDiff) / 2;
+            
+            // Refined logic: Higher credit ratings contribute positively to the score
+            // 60% commercial match, 40% credit rating strength
+            const finalScore = Math.round((baseScore * 0.6 + ratingScore * 0.4) * 100);
+
+            results.push({
+              category: l.category,
+              id: `${l.id}-${r.id}`,
+              title: `${l.commodity} (${l.quantity} MT)`,
+              buyer: r.buyer,
+              seller: l.seller,
+              amount: formatCurrency(l.quantity * l.price, currency, locale),
+              colorClass: l.category === t.metals ? 'bg-blue-50 text-on-tertiary-container' : l.category === t.energy ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600',
+              column: results.length % 3 === 0 ? 'PROPUESTO' : results.length % 3 === 1 ? 'NEGOCIACIÓN' : 'DOCUMENTACIÓN',
+              matchScore: finalScore,
+              buyerRating: r.creditRating,
+              sellerRating: l.creditRating
+            });
+          }
+        }
+      });
+    });
+    return results;
+  }, [listings, requests, currency, locale, t.metals, t.energy, t.agriculture]);
 
   const filteredMatches = selectedCategory === 'Global' 
     ? matches 
@@ -2567,22 +2662,24 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
   const [selectedSettlement, setSelectedSettlement] = useState<any>(null);
   const [showReconciliation, setShowReconciliation] = useState(false);
   const [reconcilingItem, setReconcilingItem] = useState<any>(null);
+  const [discrepancyReason, setDiscrepancyReason] = useState('');
+  const [isFlagging, setIsFlagging] = useState(false);
   const [incomingPayments, setIncomingPayments] = useState([
     { id: 'PAY-001', amount: 842000, date: '2026-03-24', bank: 'Chase Manhattan', ref: 'TXN-0019283', matched: false },
     { id: 'PAY-002', amount: 1240000, date: '2026-03-26', bank: 'HSBC London', ref: 'TXN-0019284', matched: false },
     { id: 'PAY-003', amount: 415000, date: '2026-03-25', bank: 'Santander Madrid', ref: 'TXN-0019285', matched: false }, // Discrepancy: 415500 vs 415000
   ]);
   const [settlements, setSettlements] = useState([
-    { id: 'SET-9012', client: 'REFI-44', amount: 842000, status: 'Completado', date: '2026-03-24', type: 'Pago', bank: 'Chase Manhattan', ref: 'TXN-0019283', fee: 1200, method: 'SWIFT', docs: [{ name: 'Invoice_9012.pdf', date: '2026-03-24' }] },
-    { id: 'SET-9013', client: 'MINE-014', amount: 1240000, status: 'Pendiente', date: '2026-03-26', type: 'Cobro', bank: 'HSBC London', ref: 'TXN-0019284', fee: 2500, method: 'Wire Transfer', docs: [] },
-    { id: 'SET-9014', client: 'FOOD-08', amount: 415500, status: 'En Proceso', date: '2026-03-25', type: 'Pago', bank: 'Santander Madrid', ref: 'TXN-0019285', fee: 850, method: 'SEPA', docs: [] },
-    { id: 'SET-9015', client: 'AGRO-42', amount: 124000, status: 'Completado', date: '2026-03-22', type: 'Cobro', bank: 'Rabobank NL', ref: 'TXN-0019286', fee: 400, method: 'Wire Transfer', docs: [] },
-    { id: 'SET-9016', client: 'TRAD-99', amount: 560000, status: 'Completado', date: '2026-03-21', type: 'Pago', bank: 'Standard Chartered', ref: 'TXN-0019287', fee: 1100, method: 'SWIFT', docs: [] },
-    { id: 'SET-9017', client: 'INST-772', amount: 2100000, status: 'Pendiente', date: '2026-03-27', type: 'Cobro', bank: 'Goldman Sachs', ref: 'TXN-0019288', fee: 4200, method: 'Wire Transfer', docs: [] },
-    { id: 'SET-9018', client: 'REFI-44', amount: 320000, status: 'Completado', date: '2026-03-20', type: 'Pago', bank: 'Chase Manhattan', ref: 'TXN-0019289', fee: 650, method: 'SWIFT', docs: [] },
-    { id: 'SET-9019', client: 'MINE-014', amount: 980000, status: 'En Proceso', date: '2026-03-26', type: 'Cobro', bank: 'HSBC London', ref: 'TXN-0019290', fee: 1950, method: 'Wire Transfer', docs: [] },
-    { id: 'SET-9020', client: 'FOOD-08', amount: 150000, status: 'Completado', date: '2026-03-19', type: 'Pago', bank: 'Santander Madrid', ref: 'TXN-0019291', fee: 300, method: 'SEPA', docs: [] },
-    { id: 'SET-9021', client: 'AGRO-42', amount: 75000, status: 'Pendiente', date: '2026-03-28', type: 'Cobro', bank: 'Rabobank NL', ref: 'TXN-0019292', fee: 150, method: 'Wire Transfer', docs: [] },
+    { id: 'SET-9012', client: 'REFI-44', amount: 842000, status: 'Completado', date: '2026-03-24', type: 'Pago', bank: 'Chase Manhattan', ref: 'TXN-0019283', fee: 1200, method: 'SWIFT', docs: [{ name: 'Invoice_9012.pdf', date: '2026-03-24' }], flagged: false, discrepancyReason: '' },
+    { id: 'SET-9013', client: 'MINE-014', amount: 1240000, status: 'Pendiente', date: '2026-03-26', type: 'Cobro', bank: 'HSBC London', ref: 'TXN-0019284', fee: 2500, method: 'Wire Transfer', docs: [], flagged: false, discrepancyReason: '' },
+    { id: 'SET-9014', client: 'FOOD-08', amount: 415500, status: 'En Proceso', date: '2026-03-25', type: 'Pago', bank: 'Santander Madrid', ref: 'TXN-0019285', fee: 850, method: 'SEPA', docs: [], flagged: true, discrepancyReason: 'Monto no coincide con el pago entrante' },
+    { id: 'SET-9015', client: 'AGRO-42', amount: 124000, status: 'Completado', date: '2026-03-22', type: 'Cobro', bank: 'Rabobank NL', ref: 'TXN-0019286', fee: 400, method: 'Wire Transfer', docs: [], flagged: false, discrepancyReason: '' },
+    { id: 'SET-9016', client: 'TRAD-99', amount: 560000, status: 'Completado', date: '2026-03-21', type: 'Pago', bank: 'Standard Chartered', ref: 'TXN-0019287', fee: 1100, method: 'SWIFT', docs: [], flagged: false, discrepancyReason: '' },
+    { id: 'SET-9017', client: 'INST-772', amount: 2100000, status: 'Pendiente', date: '2026-03-27', type: 'Cobro', bank: 'Goldman Sachs', ref: 'TXN-0019288', fee: 4200, method: 'Wire Transfer', docs: [], flagged: false, discrepancyReason: '' },
+    { id: 'SET-9018', client: 'REFI-44', amount: 320000, status: 'Completado', date: '2026-03-20', type: 'Pago', bank: 'Chase Manhattan', ref: 'TXN-0019289', fee: 650, method: 'SWIFT', docs: [], flagged: false, discrepancyReason: '' },
+    { id: 'SET-9019', client: 'MINE-014', amount: 980000, status: 'En Proceso', date: '2026-03-26', type: 'Cobro', bank: 'HSBC London', ref: 'TXN-0019290', fee: 1950, method: 'Wire Transfer', docs: [], flagged: false, discrepancyReason: '' },
+    { id: 'SET-9020', client: 'FOOD-08', amount: 150000, status: 'Completado', date: '2026-03-19', type: 'Pago', bank: 'Santander Madrid', ref: 'TXN-0019291', fee: 300, method: 'SEPA', docs: [], flagged: false, discrepancyReason: '' },
+    { id: 'SET-9021', client: 'AGRO-42', amount: 75000, status: 'Pendiente', date: '2026-03-28', type: 'Cobro', bank: 'Rabobank NL', ref: 'TXN-0019292', fee: 150, method: 'Wire Transfer', docs: [], flagged: false, discrepancyReason: '' },
   ]);
   const itemsPerPage = 5;
 
@@ -2625,6 +2722,40 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
         }));
       }
     }
+  };
+
+  const matchPayment = (payment: any, item: any) => {
+    if (!item) return false;
+    
+    // Logic: Match if Ref matches OR (Amount matches AND Bank matches AND Date is within 3 days)
+    const refMatch = payment.ref === item.ref;
+    const amountMatch = Math.abs(payment.amount - item.amount) < 0.01;
+    const bankMatch = payment.bank === item.bank;
+    
+    const pDate = new Date(payment.date);
+    const iDate = new Date(item.date);
+    const dateDiff = Math.abs(pDate.getTime() - iDate.getTime()) / (1000 * 3600 * 24);
+    const dateMatch = dateDiff <= 3;
+
+    return refMatch || (amountMatch && bankMatch && dateMatch);
+  };
+
+  const getMatchQuality = (payment: any, item: any) => {
+    if (!item) return null;
+    const refMatch = payment.ref === item.ref;
+    const amountMatch = Math.abs(payment.amount - item.amount) < 0.01;
+    const bankMatch = payment.bank === item.bank;
+    
+    if (refMatch && amountMatch) return { label: 'ALTA', color: 'text-green-600 bg-green-50' };
+    if (amountMatch && bankMatch) return { label: 'MEDIA', color: 'text-orange-600 bg-orange-50' };
+    return { label: 'BAJA', color: 'text-outline bg-surface-container' };
+  };
+
+  const handleMatch = (paymentId: string) => {
+    if (!reconcilingItem) return;
+    setIncomingPayments(prev => prev.map(p => 
+      p.id === paymentId ? { ...p, matched: !p.matched } : p
+    ));
   };
 
   const handleSort = (key: string) => {
@@ -2790,12 +2921,20 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
                 <td className="px-6 py-4 text-xs font-black text-primary">{formatCurrency(item.amount, currency, language === 'es' ? 'es-ES' : 'en-US')}</td>
                 <td className="px-6 py-4 text-xs text-on-surface-variant">{item.date}</td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
-                    <div className={cn(
-                      "w-1.5 h-1.5 rounded-full",
-                      item.status === 'Completado' ? "bg-green-500" : item.status === 'Pendiente' ? "bg-orange-500" : "bg-blue-500"
-                    )}></div>
-                    <span className="text-[10px] font-bold uppercase tracking-tight">{item.status}</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <div className={cn(
+                        "w-1.5 h-1.5 rounded-full",
+                        item.status === 'Completado' ? "bg-green-500" : item.status === 'Pendiente' ? "bg-orange-500" : "bg-blue-500"
+                      )}></div>
+                      <span className="text-[10px] font-bold uppercase tracking-tight">{item.status}</span>
+                    </div>
+                    {item.flagged && (
+                      <div className="flex items-center gap-1 text-[8px] font-black text-error uppercase tracking-tighter bg-error/5 px-1.5 py-0.5 rounded border border-error/10 w-fit">
+                        <AlertTriangle className="w-2.5 h-2.5" />
+                        DISCREPANCIA
+                      </div>
+                    )}
                   </div>
                 </td>
                 <td className="px-6 py-4 text-right">
@@ -3094,10 +3233,10 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
                       <h4 className="text-[10px] font-black text-outline uppercase tracking-widest mb-4">Resumen de Conciliación</h4>
                       <div className="space-y-4">
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] text-outline uppercase tracking-widest">Total Pagos Emparejados</span>
+                          <span className="text-[10px] text-outline uppercase tracking-widest">{t.matchedTotal}</span>
                           <span className="text-xs font-bold">
                             {formatCurrency(
-                              incomingPayments.filter(p => p.matched && p.ref === reconcilingItem.ref).reduce((acc, p) => acc + p.amount, 0),
+                              incomingPayments.filter(p => p.matched).reduce((acc, p) => acc + p.amount, 0),
                               currency,
                               language === 'es' ? 'es-ES' : 'en-US'
                             )}
@@ -3105,24 +3244,77 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
                         </div>
                         
                         {(() => {
-                          const matchedTotal = incomingPayments.filter(p => p.matched && p.ref === reconcilingItem.ref).reduce((acc, p) => acc + p.amount, 0);
+                          const matchedTotal = incomingPayments.filter(p => p.matched).reduce((acc, p) => acc + p.amount, 0);
                           const discrepancy = reconcilingItem.amount - matchedTotal;
                           
-                          if (matchedTotal > 0) {
+                          if (matchedTotal > 0 || isFlagging) {
                             return (
-                              <div className={cn(
-                                "p-3 rounded-lg flex items-center gap-3",
-                                discrepancy === 0 ? "bg-green-50 text-green-700 border border-green-100" : "bg-error/5 text-error border border-error/10"
-                              )}>
-                                {discrepancy === 0 ? <CheckCircle2 className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
-                                <div>
-                                  <p className="text-[10px] font-black uppercase tracking-widest">
-                                    {discrepancy === 0 ? t.perfectReconciliation : t.discrepancy}
-                                  </p>
-                                  {discrepancy !== 0 && (
-                                    <p className="text-xs font-bold">{t.difference}: {formatCurrency(Math.abs(discrepancy), currency, language === 'es' ? 'es-ES' : 'en-US')}</p>
+                              <div className="space-y-3">
+                                <div className={cn(
+                                  "p-3 rounded-lg flex items-center gap-3",
+                                  discrepancy === 0 && !isFlagging ? "bg-green-50 text-green-700 border border-green-100" : "bg-error/5 text-error border border-error/10"
+                                )}>
+                                  {discrepancy === 0 && !isFlagging ? <CheckCircle2 className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
+                                  <div className="flex-1">
+                                    <p className="text-[10px] font-black uppercase tracking-widest">
+                                      {discrepancy === 0 && !isFlagging ? t.perfectReconciliation : t.discrepancy}
+                                    </p>
+                                    {discrepancy !== 0 && (
+                                      <p className="text-xs font-bold">{t.difference}: {formatCurrency(Math.abs(discrepancy), currency, language === 'es' ? 'es-ES' : 'en-US')}</p>
+                                    )}
+                                  </div>
+                                  {!isFlagging && (
+                                    <button 
+                                      onClick={() => setIsFlagging(true)}
+                                      className="text-[8px] font-black uppercase tracking-widest px-2 py-1 bg-error/10 text-error rounded hover:bg-error/20 transition-colors"
+                                    >
+                                      Marcar Discrepancia
+                                    </button>
                                   )}
                                 </div>
+
+                                {isFlagging && (
+                                  <motion.div 
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    className="space-y-2"
+                                  >
+                                    <label className="text-[9px] font-black text-outline uppercase tracking-widest">Motivo de la Discrepancia</label>
+                                    <textarea 
+                                      value={discrepancyReason}
+                                      onChange={(e) => setDiscrepancyReason(e.target.value)}
+                                      placeholder="Explique el motivo del flag..."
+                                      className="w-full bg-surface-container-highest border border-outline-variant/20 rounded-lg p-3 text-xs focus:outline-none focus:border-error transition-all min-h-[80px]"
+                                    />
+                                    <div className="flex gap-2">
+                                      <button 
+                                        onClick={() => {
+                                          setIsFlagging(false);
+                                          setDiscrepancyReason('');
+                                        }}
+                                        className="flex-1 py-2 text-[9px] font-bold uppercase tracking-widest border border-outline-variant/20 rounded-lg hover:bg-surface-container transition-colors"
+                                      >
+                                        Cancelar
+                                      </button>
+                                      <button 
+                                        onClick={() => {
+                                          setSettlements(settlements.map(s => 
+                                            s.id === reconcilingItem.id 
+                                              ? { ...s, flagged: true, discrepancyReason } 
+                                              : s
+                                          ));
+                                          setIsFlagging(false);
+                                          setDiscrepancyReason('');
+                                          setShowReconciliation(false);
+                                          setReconcilingItem(null);
+                                        }}
+                                        className="flex-1 py-2 text-[9px] font-bold uppercase tracking-widest bg-error text-white rounded-lg hover:opacity-90 transition-colors"
+                                      >
+                                        Confirmar Flag
+                                      </button>
+                                    </div>
+                                  </motion.div>
+                                )}
                               </div>
                             );
                           }
@@ -3156,18 +3348,22 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
                         <div className="flex justify-between items-start mb-2">
                           <div>
                             <p className="text-xs font-bold text-primary">{payment.bank}</p>
-                            <p className="text-[10px] text-outline font-medium tracking-widest uppercase">{payment.ref}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-[10px] text-outline font-medium tracking-widest uppercase">{payment.ref}</p>
+                              {reconcilingItem && (
+                                <span className={cn("text-[8px] font-black px-1.5 py-0.5 rounded", getMatchQuality(payment, reconcilingItem)?.color)}>
+                                  {getMatchQuality(payment, reconcilingItem)?.label}
+                                </span>
+                              )}
+                            </div>
                           </div>
-                          <p className="text-sm font-black text-primary">{formatCurrency(payment.amount, currency, language === 'es' ? 'es-ES' : 'en-US')}</p>
+                          <p className="text-xs font-black text-primary">{formatCurrency(payment.amount, currency, language === 'es' ? 'es-ES' : 'en-US')}</p>
                         </div>
                         <div className="flex justify-between items-center mt-4">
-                          <span className="text-[10px] text-outline">{payment.date}</span>
+                          <span className="text-[10px] text-outline font-bold uppercase tracking-widest">{payment.date}</span>
                           {reconcilingItem && (
                             <button 
-                              disabled={payment.matched}
-                              onClick={() => {
-                                setIncomingPayments(prev => prev.map(p => p.id === payment.id ? { ...p, matched: true } : p));
-                              }}
+                              onClick={() => handleMatch(payment.id)}
                               className={cn(
                                 "text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-lg transition-all",
                                 payment.matched 
@@ -3175,7 +3371,7 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
                                   : "text-primary border border-primary/20 hover:bg-primary hover:text-white"
                               )}
                             >
-                              {payment.matched ? "Emparejado" : "Emparejar"}
+                              {payment.matched ? t.matched : t.operate}
                             </button>
                           )}
                         </div>
@@ -3196,10 +3392,10 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
                   Cancelar
                 </button>
                 <button 
-                  disabled={!reconcilingItem || !incomingPayments.some(p => p.matched && p.ref === reconcilingItem.ref)}
+                  disabled={!reconcilingItem || !incomingPayments.some(p => p.matched)}
                   onClick={() => {
                     if (reconcilingItem) {
-                      const matchedTotal = incomingPayments.filter(p => p.matched && p.ref === reconcilingItem.ref).reduce((acc, p) => acc + p.amount, 0);
+                      const matchedTotal = incomingPayments.filter(p => p.matched).reduce((acc, p) => acc + p.amount, 0);
                       const discrepancy = reconcilingItem.amount - matchedTotal;
                       
                       setSettlements(prev => prev.map(s => s.id === reconcilingItem.id ? { ...s, status: discrepancy === 0 ? 'Completado' : 'En Proceso' } : s));
