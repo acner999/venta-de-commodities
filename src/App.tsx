@@ -150,7 +150,6 @@ const TRANSLATIONS = {
     markAsRead: "Marcar como leído",
     security: "Seguridad",
     saveChanges: "Guardar Cambios",
-    creditRating: "Calificación Crediticia",
     totalTradedVolume: "Volumen Total Negociado",
     vsLastMonth: "vs. mes anterior",
     closedOperations: "Operaciones Cerradas",
@@ -330,7 +329,6 @@ const TRANSLATIONS = {
     markAsRead: "Mark as read",
     security: "Security",
     saveChanges: "Save Changes",
-    creditRating: "Credit Rating",
     totalTradedVolume: "Total Traded Volume",
     vsLastMonth: "vs. last month",
     closedOperations: "Closed Operations",
@@ -1168,7 +1166,7 @@ const KPICard = ({ title, value, change, label, icon: Icon, colorClass }: any) =
   </div>
 );
 
-const MatchCard = ({ category, id, title, buyer, seller, amount, status, colorClass, matchScore, buyerRating, sellerRating }: any) => {
+const MatchCard = ({ category, id, title, buyer, seller, amount, status, colorClass, matchScore }: any) => {
   const [actionTaken, setActionTaken] = useState<string | null>(null);
   const [confirmingAction, setConfirmingAction] = useState<string | null>(null);
 
@@ -1204,15 +1202,8 @@ const MatchCard = ({ category, id, title, buyer, seller, amount, status, colorCl
       className="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/20 shadow-sm hover:shadow-md transition-shadow cursor-pointer group relative overflow-hidden"
     >
       {matchScore && (
-        <div className="absolute top-0 right-0 flex flex-col items-end">
-          <div className="px-2 py-0.5 bg-primary/10 text-primary text-[8px] font-black rounded-bl-lg border-b border-l border-primary/10">
-            MATCH: {matchScore}%
-          </div>
-          {buyerRating && (
-            <div className="px-2 py-0.5 text-[7px] font-bold text-on-surface-variant opacity-60">
-              CR: {buyerRating}/{sellerRating}
-            </div>
-          )}
+        <div className="absolute top-0 right-0 px-2 py-0.5 bg-primary/10 text-primary text-[8px] font-black rounded-bl-lg border-b border-l border-primary/10">
+          MATCH: {matchScore}%
         </div>
       )}
       <AnimatePresence>
@@ -1453,10 +1444,10 @@ const CompanyManagement = ({ language, currency, userRole }: { language: 'es' | 
   const sectors = [t.metals, t.energy, t.agriculture, 'Logística'];
 
   const [companies, setCompanies] = useState([
-    { id: 'CORP-2948-B', name: 'Aurum Metals SA', country: 'Suiza', code: 'CHE-101.928.374', access: 'TIER 1', status: 'VERIFICADO', activity: 'Hoy, 10:45 AM', trade: 'XAU/USD', sector: t.metals, creditRating: 'AAA' },
-    { id: 'CORP-1122-E', name: 'Blue Energy Global', country: 'Noruega', code: 'NO-983210452', access: 'TIER 2', status: 'KYC PENDIENTE', activity: 'Ayer, 16:20 PM', trade: 'Carga de Documentos', sector: t.energy, creditRating: 'AA' },
-    { id: 'CORP-5582-A', name: 'AgroTrading Int.', country: 'Argentina', code: 'AR-30-708293-1', access: 'TIER 1', status: 'VERIFICADO', activity: '12 Oct, 09:15 AM', trade: 'Corn Futures', sector: t.agriculture, creditRating: 'A' },
-    { id: 'CORP-0041-Z', name: 'Lux Trading Ltd', country: 'Reino Unido', code: 'UK-SC294811', access: 'TIER 1', status: 'RECHAZADO', activity: '05 Oct, 14:00 PM', trade: 'Fallo en Compliance', sector: t.metals, creditRating: 'BBB' },
+    { id: 'CORP-2948-B', name: 'Aurum Metals SA', country: 'Suiza', code: 'CHE-101.928.374', access: 'TIER 1', status: 'VERIFICADO', activity: 'Hoy, 10:45 AM', trade: 'XAU/USD', sector: t.metals },
+    { id: 'CORP-1122-E', name: 'Blue Energy Global', country: 'Noruega', code: 'NO-983210452', access: 'TIER 2', status: 'KYC PENDIENTE', activity: 'Ayer, 16:20 PM', trade: 'Carga de Documentos', sector: t.energy },
+    { id: 'CORP-5582-A', name: 'AgroTrading Int.', country: 'Argentina', code: 'AR-30-708293-1', access: 'TIER 1', status: 'VERIFICADO', activity: '12 Oct, 09:15 AM', trade: 'Corn Futures', sector: t.agriculture },
+    { id: 'CORP-0041-Z', name: 'Lux Trading Ltd', country: 'Reino Unido', code: 'UK-SC294811', access: 'TIER 1', status: 'RECHAZADO', activity: '05 Oct, 14:00 PM', trade: 'Fallo en Compliance', sector: t.metals },
   ]);
 
   if (selectedCompany) {
@@ -1679,7 +1670,6 @@ const CompanyManagement = ({ language, currency, userRole }: { language: 'es' | 
                   <tr className="bg-surface-container-low/50">
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">{t.companyName}</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">País / Registro</th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">{t.creditRating}</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Acceso</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">{t.status}</th>
                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Actividad</th>
@@ -1703,16 +1693,6 @@ const CompanyManagement = ({ language, currency, userRole }: { language: 'es' | 
                       <td className="px-6 py-6">
                         <p className="text-sm font-bold text-primary">{c.country}</p>
                         <p className="text-[10px] text-on-surface-variant">{c.code}</p>
-                      </td>
-                      <td className="px-6 py-6">
-                        <span className={cn(
-                          "px-2 py-1 rounded text-[10px] font-black",
-                          c.creditRating === 'AAA' ? "bg-green-50 text-green-700" :
-                          c.creditRating === 'AA' ? "bg-blue-50 text-blue-700" :
-                          c.creditRating === 'A' ? "bg-orange-50 text-orange-700" : "bg-surface-container-high text-on-surface-variant"
-                        )}>
-                          {c.creditRating}
-                        </span>
                       </td>
                       <td className="px-6 py-6">
                         <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-black">{c.access}</span>
@@ -1769,23 +1749,20 @@ const Dashboard = ({ onNewMatch, selectedCategory, onManageCompanies, language, 
   
   // Logic-based Matching Pipeline
   const [listings] = useState([
-    { id: 'L1', commodity: 'Cobre Grado A', type: 'Venta', quantity: 5000, price: 8200, seller: 'MINE-014', category: t.metals, creditRating: 'AA' },
-    { id: 'L2', commodity: 'Crudo Brent', type: 'Venta', quantity: 10000, price: 84, seller: 'TRAD-99', category: t.energy, creditRating: 'A' },
-    { id: 'L3', commodity: 'Trigo Soft Red', type: 'Venta', quantity: 2500, price: 210, seller: 'AGRO-42', category: t.agriculture, creditRating: 'BBB' },
+    { id: 'L1', commodity: 'Cobre Grado A', type: 'Venta', quantity: 5000, price: 8200, seller: 'MINE-014', category: t.metals },
+    { id: 'L2', commodity: 'Crudo Brent', type: 'Venta', quantity: 10000, price: 84, seller: 'TRAD-99', category: t.energy },
+    { id: 'L3', commodity: 'Trigo Soft Red', type: 'Venta', quantity: 2500, price: 210, seller: 'AGRO-42', category: t.agriculture },
   ]);
 
   const [requests] = useState([
-    { id: 'R1', commodity: 'Cobre Grado A', type: 'Compra', quantity: 4800, price: 8300, buyer: 'INST-772', category: t.metals, creditRating: 'AAA' },
-    { id: 'R2', commodity: 'Crudo Brent', type: 'Compra', quantity: 9500, price: 85, buyer: 'REFI-44', category: t.energy, creditRating: 'AA' },
-    { id: 'R3', commodity: 'Trigo Soft Red', type: 'Compra', quantity: 2600, price: 215, buyer: 'FOOD-08', category: t.agriculture, creditRating: 'A' },
+    { id: 'R1', commodity: 'Cobre Grado A', type: 'Compra', quantity: 4800, price: 8300, buyer: 'INST-772', category: t.metals },
+    { id: 'R2', commodity: 'Crudo Brent', type: 'Compra', quantity: 9500, price: 85, buyer: 'REFI-44', category: t.energy },
+    { id: 'R3', commodity: 'Trigo Soft Red', type: 'Compra', quantity: 2600, price: 215, buyer: 'FOOD-08', category: t.agriculture },
   ]);
 
   // Algorithm: Match if same commodity AND quantity within 10% AND price within 5%
-  // New Criterion: Credit Rating compatibility adds to the score
   const matches = useMemo(() => {
     const results: any[] = [];
-    const ratingScores: Record<string, number> = { 'AAA': 100, 'AA': 90, 'A': 80, 'BBB': 70 };
-
     listings.forEach(l => {
       requests.forEach(r => {
         if (l.commodity === r.commodity) {
@@ -1793,10 +1770,6 @@ const Dashboard = ({ onNewMatch, selectedCategory, onManageCompanies, language, 
           const priceDiff = Math.abs(l.price - r.price) / l.price;
           
           if (qtyDiff <= 0.1 && priceDiff <= 0.05) {
-            const ratingScore = (ratingScores[l.creditRating] + ratingScores[r.creditRating]) / 200;
-            const baseScore = 1 - (qtyDiff + priceDiff) / 2;
-            const finalScore = Math.round((baseScore * 0.7 + ratingScore * 0.3) * 100);
-
             results.push({
               category: l.category,
               id: `${l.id}-${r.id}`,
@@ -1806,9 +1779,7 @@ const Dashboard = ({ onNewMatch, selectedCategory, onManageCompanies, language, 
               amount: formatCurrency(l.quantity * l.price, currency, locale),
               colorClass: l.category === t.metals ? 'bg-blue-50 text-on-tertiary-container' : l.category === t.energy ? 'bg-orange-50 text-orange-600' : 'bg-green-50 text-green-600',
               column: results.length % 3 === 0 ? 'PROPUESTO' : results.length % 3 === 1 ? 'NEGOCIACIÓN' : 'DOCUMENTACIÓN',
-              matchScore: finalScore,
-              buyerRating: r.creditRating,
-              sellerRating: l.creditRating
+              matchScore: Math.round((1 - (qtyDiff + priceDiff) / 2) * 100)
             });
           }
         }
