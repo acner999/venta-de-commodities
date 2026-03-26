@@ -45,6 +45,7 @@ import {
   Shield,
   ShieldCheck,
   AlertCircle,
+  AlertTriangle,
   Menu,
   X,
   Calendar,
@@ -78,7 +79,7 @@ const TRANSLATIONS = {
   es: {
     dashboard: "Dashboard",
     markets: "Mercados",
-    settlements: "Liquidaciones",
+    settlements: "Pagos y Cobros",
     documents: "Documentos",
     companies: "Empresas",
     searchPlaceholder: "Buscar empresas, operaciones, documentos...",
@@ -139,12 +140,14 @@ const TRANSLATIONS = {
     complianceSummary: "Resumen de Cumplimiento",
     marketMonitor: "Monitor de Mercados",
     realTimePrices: "Precios en tiempo real y tendencias globales de commodities.",
-    settlementDetails: "Detalles de la Liquidación",
+    settlementDetails: "Detalles de Pago",
     dateRange: "Rango de Fechas",
     search: "Buscar",
     export: "Exportar",
     profile: "Perfil",
     notifications: "Notificaciones",
+    noNotifications: "No hay notificaciones",
+    markAsRead: "Marcar como leído",
     security: "Seguridad",
     saveChanges: "Guardar Cambios",
     totalTradedVolume: "Volumen Total Negociado",
@@ -175,7 +178,7 @@ const TRANSLATIONS = {
     changePassword: "Cambiar Contraseña",
     connectedDevices: "Dispositivos Conectados",
     jan: "Ene", feb: "Feb", mar: "Mar", apr: "Abr", may: "May", jun: "Jun",
-    metals: "Metales", energy: "Energía", agriculture: "Agrícolas",
+    metals: "Metales", energy: "Energía", agriculture: "Agrícolas", logistics: "Logística",
     client: "Cliente", amount: "Monto", date: "Fecha", type: "Tipo", bank: "Banco", ref: "Referencia", fee: "Comisión", method: "Método",
     completed: "Completado", pending: "Pendiente", inProcess: "En Proceso",
     payment: "Pago", collection: "Cobro",
@@ -226,18 +229,35 @@ const TRANSLATIONS = {
     passwordChanged: "Contraseña cambiada exitosamente",
     filterByType: "Filtrar por Tipo",
     associatedDocuments: "Documentos Asociados",
-    uploadSettlementDoc: "Subir Documento de Liquidación",
+    uploadSettlementDoc: "Subir Documento de Pago",
     noDocuments: "No hay documentos asociados",
     adminRole: "Administrador",
     operatorRole: "Operador",
     viewerRole: "Consultor",
     accessDenied: "Acceso Denegado",
     insufficientPermissions: "No tienes permisos suficientes para realizar esta acción.",
+    reconciliation: "Conciliación",
+    reconcileAccounts: "Conciliar Cuentas",
+    matchPayments: "Emparejar Pagos",
+    discrepancy: "Discrepancia",
+    matched: "Conciliado",
+    unmatched: "Sin Conciliar",
+    reconciliationSummary: "Resumen de Conciliación",
+    newNotification: "Nueva Notificación",
+    incomingPayments: "Pagos Entrantes",
+    outgoingPayments: "Pagos Salientes",
+    flagDiscrepancy: "Marcar Discrepancia",
+    confirmReconciliation: "Confirmar Conciliación",
+    changeSelection: "Cambiar Selección",
+    expectedAmount: "Monto Esperado",
+    perfectReconciliation: "Conciliación Perfecta",
+    difference: "Diferencia",
+    incomingPaymentsBank: "Pagos Entrantes (Bancos)",
   },
   en: {
     dashboard: "Dashboard",
     markets: "Markets",
-    settlements: "Settlements",
+    settlements: "Payments & Collections",
     documents: "Documents",
     companies: "Companies",
     searchPlaceholder: "Search companies, operations, documents...",
@@ -298,12 +318,14 @@ const TRANSLATIONS = {
     complianceSummary: "Compliance Summary",
     marketMonitor: "Market Monitor",
     realTimePrices: "Real-time prices and global commodity trends.",
-    settlementDetails: "Settlement Details",
+    settlementDetails: "Payment Details",
     dateRange: "Date Range",
     search: "Search",
     export: "Export",
     profile: "Profile",
     notifications: "Notifications",
+    noNotifications: "No notifications",
+    markAsRead: "Mark as read",
     security: "Security",
     saveChanges: "Save Changes",
     totalTradedVolume: "Total Traded Volume",
@@ -334,7 +356,7 @@ const TRANSLATIONS = {
     changePassword: "Change Password",
     connectedDevices: "Connected Devices",
     jan: "Jan", feb: "Feb", mar: "Mar", apr: "Apr", may: "May", jun: "Jun",
-    metals: "Metals", energy: "Energy", agriculture: "Agriculture",
+    metals: "Metals", energy: "Energy", agriculture: "Agriculture", logistics: "Logistics",
     client: "Client", amount: "Amount", date: "Date", type: "Type", bank: "Bank", ref: "Reference", fee: "Fee", method: "Method",
     completed: "Completed", pending: "Pending", inProcess: "In Process",
     payment: "Payment", collection: "Collection",
@@ -385,13 +407,30 @@ const TRANSLATIONS = {
     passwordChanged: "Password changed successfully",
     filterByType: "Filter by Type",
     associatedDocuments: "Associated Documents",
-    uploadSettlementDoc: "Upload Settlement Document",
+    uploadSettlementDoc: "Upload Payment Document",
     noDocuments: "No associated documents",
     adminRole: "Admin",
     operatorRole: "Operator",
     viewerRole: "Viewer",
     accessDenied: "Access Denied",
     insufficientPermissions: "You do not have sufficient permissions to perform this action.",
+    reconciliation: "Reconciliation",
+    reconcileAccounts: "Reconcile Accounts",
+    matchPayments: "Match Payments",
+    discrepancy: "Discrepancy",
+    matched: "Matched",
+    unmatched: "Unmatched",
+    reconciliationSummary: "Reconciliation Summary",
+    newNotification: "New Notification",
+    incomingPayments: "Incoming Payments",
+    outgoingPayments: "Outgoing Payments",
+    flagDiscrepancy: "Flag Discrepancy",
+    confirmReconciliation: "Confirmar Reconciliation",
+    changeSelection: "Change Selection",
+    expectedAmount: "Expected Amount",
+    perfectReconciliation: "Perfect Reconciliation",
+    difference: "Difference",
+    incomingPaymentsBank: "Incoming Payments (Banks)",
   }
 };
 
@@ -848,7 +887,11 @@ const TopBar = ({
   setShowSearchResults,
   filteredResults,
   language,
-  onNavigate
+  onNavigate,
+  notifications,
+  showNotifications,
+  setShowNotifications,
+  setNotifications
 }: { 
   selectedCategory: string, 
   setSelectedCategory: (c: string) => void,
@@ -864,11 +907,21 @@ const TopBar = ({
   setShowSearchResults: (s: boolean) => void,
   filteredResults: any,
   language: 'es' | 'en',
-  onNavigate: (tab: string) => void
+  onNavigate: (tab: string) => void,
+  notifications: any[],
+  showNotifications: boolean,
+  setShowNotifications: (s: boolean) => void,
+  setNotifications: (n: any) => void
 }) => {
   const categories = ['Global', 'Metales', 'Energía', 'Agrícolas'];
   const t = TRANSLATIONS[language];
   
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })));
+  };
+
   return (
     <header className="fixed top-0 right-0 w-full md:w-[calc(100%-16rem)] z-30 bg-surface/85 backdrop-blur-md flex justify-between items-center h-16 px-4 md:px-8 border-b border-outline-variant/20">
       <div className="flex items-center gap-4 md:gap-8 flex-1">
@@ -1000,34 +1053,96 @@ const TopBar = ({
         </nav>
       </div>
 
-      <div className="flex items-center gap-3 md:gap-6">
-        <div className="hidden sm:flex items-center gap-4 text-on-surface-variant">
-          <button className="relative hover:text-primary transition-colors">
+      <div className="flex items-center gap-2 md:gap-4">
+        <div className="relative">
+          <button 
+            onClick={() => setShowNotifications(!showNotifications)}
+            className="p-2 hover:bg-surface-container rounded-full text-on-surface-variant relative transition-colors"
+          >
             <Bell className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 bg-error w-2 h-2 rounded-full"></span>
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 w-4 h-4 bg-error text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-surface">
+                {unreadCount}
+              </span>
+            )}
           </button>
-          <button 
-            onClick={onProfileClick}
-            className="hover:text-primary transition-colors"
-          >
-            <User className="w-5 h-5" />
-          </button>
+
+          <AnimatePresence>
+            {showNotifications && (
+              <>
+                <div className="fixed inset-0 z-[-1]" onClick={() => setShowNotifications(false)}></div>
+                <motion.div 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute top-full right-0 mt-2 w-80 bg-surface-container-highest border border-outline-variant/20 rounded-2xl shadow-2xl overflow-hidden z-50"
+                >
+                  <div className="p-4 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">{t.notifications}</h4>
+                    {unreadCount > 0 && (
+                      <button 
+                        onClick={markAllAsRead}
+                        className="text-[8px] font-bold text-primary hover:underline uppercase tracking-widest"
+                      >
+                        {t.markAsRead}
+                      </button>
+                    )}
+                  </div>
+                  <div className="max-h-[400px] overflow-y-auto divide-y divide-outline-variant/5">
+                    {notifications.length > 0 ? (
+                      notifications.map((n) => (
+                        <div key={n.id} className={cn("p-4 hover:bg-surface-container-low transition-colors cursor-pointer", !n.read && "bg-primary/5")}>
+                          <div className="flex gap-3">
+                            <div className={cn(
+                              "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
+                              n.type === 'settlement' ? "bg-blue-50 text-blue-600" : n.type === 'doc' ? "bg-green-50 text-green-600" : "bg-orange-50 text-orange-600"
+                            )}>
+                              {n.type === 'settlement' ? <Wallet className="w-4 h-4" /> : n.type === 'doc' ? <FileText className="w-4 h-4" /> : <Activity className="w-4 h-4" />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between items-start">
+                                <p className="text-xs font-bold text-primary truncate">{n.title}</p>
+                                <span className="text-[8px] text-outline font-medium whitespace-nowrap ml-2">{n.time}</span>
+                              </div>
+                              <p className="text-[10px] text-on-surface-variant mt-0.5 line-clamp-2">{n.desc}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-8 text-center">
+                        <Bell className="w-8 h-8 text-outline mx-auto mb-2 opacity-20" />
+                        <p className="text-xs text-outline italic">{t.noNotifications}</p>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </div>
-        <div className="flex gap-2">
-          <button 
-            onClick={onNewOperation}
-            className="hidden md:block border border-outline-variant/20 text-primary px-5 py-2 text-xs font-bold uppercase tracking-widest rounded-sm active:opacity-70 transition-all"
-          >
-            {t.newMatch}
-          </button>
-          <button 
-            onClick={onExecuteOrder}
-            className="bg-primary text-white px-4 md:px-5 py-2 text-[10px] md:text-xs font-bold uppercase tracking-widest rounded-sm active:opacity-70 transition-all shadow-lg shadow-primary/20"
-          >
-            <span className="hidden xs:inline">Ejecutar Orden</span>
-            <Zap className="w-4 h-4 xs:hidden" />
-          </button>
-        </div>
+
+        <button 
+          onClick={() => setDarkMode(!darkMode)}
+          className="p-2 hover:bg-surface-container rounded-full text-on-surface-variant transition-colors"
+        >
+          {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </button>
+        
+        <div className="h-8 w-px bg-outline-variant/20 mx-2 hidden sm:block"></div>
+        
+        <button 
+          onClick={onProfileClick}
+          className="flex items-center gap-3 p-1 pr-3 hover:bg-surface-container rounded-full transition-colors group"
+        >
+          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-black text-xs shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform">
+            AB
+          </div>
+          <div className="text-left hidden sm:block">
+            <p className="text-[10px] font-black uppercase tracking-tighter text-primary">Alexander Broker</p>
+            <p className="text-[8px] font-bold text-outline uppercase tracking-widest">Senior Partner</p>
+          </div>
+        </button>
       </div>
     </header>
   );
@@ -2450,6 +2565,13 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedSettlement, setSelectedSettlement] = useState<any>(null);
+  const [showReconciliation, setShowReconciliation] = useState(false);
+  const [reconcilingItem, setReconcilingItem] = useState<any>(null);
+  const [incomingPayments, setIncomingPayments] = useState([
+    { id: 'PAY-001', amount: 842000, date: '2026-03-24', bank: 'Chase Manhattan', ref: 'TXN-0019283', matched: false },
+    { id: 'PAY-002', amount: 1240000, date: '2026-03-26', bank: 'HSBC London', ref: 'TXN-0019284', matched: false },
+    { id: 'PAY-003', amount: 415000, date: '2026-03-25', bank: 'Santander Madrid', ref: 'TXN-0019285', matched: false }, // Discrepancy: 415500 vs 415000
+  ]);
   const [settlements, setSettlements] = useState([
     { id: 'SET-9012', client: 'REFI-44', amount: 842000, status: 'Completado', date: '2026-03-24', type: 'Pago', bank: 'Chase Manhattan', ref: 'TXN-0019283', fee: 1200, method: 'SWIFT', docs: [{ name: 'Invoice_9012.pdf', date: '2026-03-24' }] },
     { id: 'SET-9013', client: 'MINE-014', amount: 1240000, status: 'Pendiente', date: '2026-03-26', type: 'Cobro', bank: 'HSBC London', ref: 'TXN-0019284', fee: 2500, method: 'Wire Transfer', docs: [] },
@@ -2594,10 +2716,13 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
             />
           </div>
           <button className="bg-surface-container-high px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-            <Download className="w-4 h-4" /> Exportar
+            <Download className="w-4 h-4" /> {t.export}
           </button>
-          <button className="bg-primary text-white px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest">
-            Conciliar Cuentas
+          <button 
+            onClick={() => setShowReconciliation(true)}
+            className="bg-primary text-white px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-primary/90 transition-all active:scale-95"
+          >
+            {t.reconciliation}
           </button>
         </div>
       </div>
@@ -2642,7 +2767,7 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
               >
                 <div className="flex items-center">{t.status} <SortIcon column="status" /></div>
               </th>
-              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant text-right">Acciones</th>
+              <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-on-surface-variant text-right">{t.actions}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-outline-variant/5">
@@ -2836,11 +2961,11 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
                   <h4 className="text-[10px] font-black text-primary uppercase tracking-widest border-b border-outline-variant/10 pb-2">{t.bankDetails}</h4>
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-1">
-                      <p className="text-[9px] font-bold text-outline uppercase tracking-widest">Banco</p>
+                      <p className="text-[9px] font-bold text-outline uppercase tracking-widest">{t.bank}</p>
                       <p className="text-xs font-medium">{selectedSettlement.bank}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[9px] font-bold text-outline uppercase tracking-widest">Método</p>
+                      <p className="text-[9px] font-bold text-outline uppercase tracking-widest">{t.method}</p>
                       <p className="text-xs font-medium">{selectedSettlement.method}</p>
                     </div>
                     <div className="col-span-2 space-y-1">
@@ -2851,12 +2976,242 @@ const Settlements = ({ language, currency, userRole }: { language: 'es' | 'en', 
                 </div>
               </div>
 
-              <div className="p-6 bg-surface-container-low border-t border-outline-variant/10 flex gap-3">
-                <button className="flex-1 bg-primary text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:scale-[1.02] transition-transform flex items-center justify-center gap-2">
-                  <Download className="w-4 h-4" /> {t.downloadReceipt || 'Descargar Comprobante'}
+              <div className="p-6 bg-surface-container-low border-t border-outline-variant/10 flex flex-col gap-3">
+                <div className="flex gap-3 w-full">
+                  <button className="flex-1 bg-primary text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:scale-[1.02] transition-transform flex items-center justify-center gap-2">
+                    <Download className="w-4 h-4" /> {t.downloadReceipt || 'Descargar Comprobante'}
+                  </button>
+                  <button className="px-6 border border-outline-variant/20 text-primary py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-surface-container transition-colors">
+                    <Printer className="w-4 h-4" />
+                  </button>
+                </div>
+                {selectedSettlement.status !== 'Completado' && (
+                  <button 
+                    onClick={() => {
+                      setReconcilingItem(selectedSettlement);
+                      setShowReconciliation(true);
+                      setSelectedSettlement(null);
+                    }}
+                    className="w-full bg-on-tertiary-container text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-tertiary/20 hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle2 className="w-4 h-4" /> {t.matchPayments}
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {showReconciliation && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+            onClick={() => {
+              setShowReconciliation(false);
+              setReconcilingItem(null);
+            }}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-surface-container-lowest w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden border border-outline-variant/10"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="p-6 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low">
+                <div>
+                  <h3 className="text-xl font-black text-primary font-headline uppercase tracking-tighter">{t.reconciliation}</h3>
+                  <p className="text-[10px] text-outline font-bold tracking-widest uppercase mt-1">{t.reconcileAccounts}</p>
+                </div>
+                <button 
+                  onClick={() => {
+                    setShowReconciliation(false);
+                    setReconcilingItem(null);
+                  }}
+                  className="p-2 hover:bg-surface-container-high rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5" />
                 </button>
-                <button className="px-6 border border-outline-variant/20 text-primary py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-surface-container transition-colors">
-                  <Printer className="w-4 h-4" />
+              </div>
+
+              <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8 max-h-[80vh] overflow-y-auto">
+                {/* Left Side: Settlements List or Selected Item */}
+                <div className="space-y-6">
+                  <div className="p-4 bg-primary/5 rounded-xl border border-primary/10">
+                    <h4 className="text-[10px] font-black text-primary uppercase tracking-widest mb-4">Pago a Conciliar</h4>
+                    {reconcilingItem ? (
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-bold">{reconcilingItem.id}</span>
+                          <span className={cn(
+                            "text-[9px] font-black px-2 py-0.5 rounded uppercase",
+                            reconcilingItem.type === 'Pago' ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
+                          )}>
+                            {reconcilingItem.type}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-outline uppercase tracking-widest">{t.client}</span>
+                          <span className="text-xs font-bold">{reconcilingItem.client}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-outline uppercase tracking-widest">{t.expectedAmount}</span>
+                          <span className="text-sm font-black text-primary">{formatCurrency(reconcilingItem.amount, currency, language === 'es' ? 'es-ES' : 'en-US')}</span>
+                        </div>
+                        <button 
+                          onClick={() => setReconcilingItem(null)}
+                          className="w-full mt-2 text-[10px] font-bold text-error hover:underline uppercase tracking-widest"
+                        >
+                          {t.changeSelection}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <p className="text-[10px] text-outline italic mb-3">Seleccione un registro de la tabla para conciliar</p>
+                        <div className="max-h-[300px] overflow-y-auto space-y-2">
+                          {settlements.filter(s => s.status !== 'Completado').map(s => (
+                            <button 
+                              key={s.id}
+                              onClick={() => setReconcilingItem(s)}
+                              className="w-full text-left p-3 bg-surface-container-low hover:bg-surface-container-high rounded-lg border border-outline-variant/10 transition-colors flex justify-between items-center"
+                            >
+                              <div>
+                                <p className="text-xs font-bold">{s.id}</p>
+                                <p className="text-[10px] text-outline">{s.client}</p>
+                              </div>
+                              <p className="text-xs font-black text-primary">{formatCurrency(s.amount, currency, language === 'es' ? 'es-ES' : 'en-US')}</p>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {reconcilingItem && (
+                    <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                      <h4 className="text-[10px] font-black text-outline uppercase tracking-widest mb-4">Resumen de Conciliación</h4>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-outline uppercase tracking-widest">Total Pagos Emparejados</span>
+                          <span className="text-xs font-bold">
+                            {formatCurrency(
+                              incomingPayments.filter(p => p.matched && p.ref === reconcilingItem.ref).reduce((acc, p) => acc + p.amount, 0),
+                              currency,
+                              language === 'es' ? 'es-ES' : 'en-US'
+                            )}
+                          </span>
+                        </div>
+                        
+                        {(() => {
+                          const matchedTotal = incomingPayments.filter(p => p.matched && p.ref === reconcilingItem.ref).reduce((acc, p) => acc + p.amount, 0);
+                          const discrepancy = reconcilingItem.amount - matchedTotal;
+                          
+                          if (matchedTotal > 0) {
+                            return (
+                              <div className={cn(
+                                "p-3 rounded-lg flex items-center gap-3",
+                                discrepancy === 0 ? "bg-green-50 text-green-700 border border-green-100" : "bg-error/5 text-error border border-error/10"
+                              )}>
+                                {discrepancy === 0 ? <CheckCircle2 className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
+                                <div>
+                                  <p className="text-[10px] font-black uppercase tracking-widest">
+                                    {discrepancy === 0 ? t.perfectReconciliation : t.discrepancy}
+                                  </p>
+                                  {discrepancy !== 0 && (
+                                    <p className="text-xs font-bold">{t.difference}: {formatCurrency(Math.abs(discrepancy), currency, language === 'es' ? 'es-ES' : 'en-US')}</p>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right Side: Incoming Payments to Match */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-[10px] font-black text-outline uppercase tracking-widest">{t.incomingPaymentsBank}</h4>
+                    <span className="text-[10px] font-bold text-primary bg-primary/5 px-2 py-0.5 rounded-full">
+                      {incomingPayments.filter(p => !p.matched).length} {t.pending}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {incomingPayments.map(payment => (
+                      <div 
+                        key={payment.id}
+                        className={cn(
+                          "p-4 rounded-xl border transition-all",
+                          payment.matched 
+                            ? "bg-green-50/50 border-green-100 opacity-60" 
+                            : "bg-surface-container-lowest border-outline-variant/10 hover:border-primary/30"
+                        )}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="text-xs font-bold text-primary">{payment.bank}</p>
+                            <p className="text-[10px] text-outline font-medium tracking-widest uppercase">{payment.ref}</p>
+                          </div>
+                          <p className="text-sm font-black text-primary">{formatCurrency(payment.amount, currency, language === 'es' ? 'es-ES' : 'en-US')}</p>
+                        </div>
+                        <div className="flex justify-between items-center mt-4">
+                          <span className="text-[10px] text-outline">{payment.date}</span>
+                          {reconcilingItem && (
+                            <button 
+                              disabled={payment.matched}
+                              onClick={() => {
+                                setIncomingPayments(prev => prev.map(p => p.id === payment.id ? { ...p, matched: true } : p));
+                              }}
+                              className={cn(
+                                "text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-lg transition-all",
+                                payment.matched 
+                                  ? "text-green-600 bg-green-100" 
+                                  : "text-primary border border-primary/20 hover:bg-primary hover:text-white"
+                              )}
+                            >
+                              {payment.matched ? "Emparejado" : "Emparejar"}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 border-t border-outline-variant/10 bg-surface-container-low flex gap-4">
+                <button 
+                  onClick={() => {
+                    setShowReconciliation(false);
+                    setReconcilingItem(null);
+                  }}
+                  className="flex-1 border border-outline-variant/20 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-surface-container transition-all"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  disabled={!reconcilingItem || !incomingPayments.some(p => p.matched && p.ref === reconcilingItem.ref)}
+                  onClick={() => {
+                    if (reconcilingItem) {
+                      const matchedTotal = incomingPayments.filter(p => p.matched && p.ref === reconcilingItem.ref).reduce((acc, p) => acc + p.amount, 0);
+                      const discrepancy = reconcilingItem.amount - matchedTotal;
+                      
+                      setSettlements(prev => prev.map(s => s.id === reconcilingItem.id ? { ...s, status: discrepancy === 0 ? 'Completado' : 'En Proceso' } : s));
+                      setShowReconciliation(false);
+                      setReconcilingItem(null);
+                      // Reset matches for demo
+                      setIncomingPayments(prev => prev.map(p => ({ ...p, matched: false })));
+                    }
+                  }}
+                  className="flex-1 bg-primary text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                >
+                  Confirmar Conciliación
                 </button>
               </div>
             </motion.div>
@@ -3053,10 +3408,10 @@ const SettingsView = ({ language, userRole, setUserRole }: { language: 'es' | 'e
             <div className="space-y-2 md:col-span-2">
               <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">{t.sectors}</label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {['Metales', 'Energía', 'Agrícolas', 'Logística'].map(sector => (
-                  <label key={sector} className="flex items-center gap-2 bg-surface-container-low px-4 py-2 rounded-lg border border-outline-variant/10 cursor-pointer hover:bg-surface-container transition-colors">
-                    <input type="checkbox" defaultChecked={['Metales', 'Energía'].includes(sector)} className="accent-primary" />
-                    <span className="text-xs font-medium">{sector}</span>
+                {['metals', 'energy', 'agriculture', 'logistics'].map(sectorKey => (
+                  <label key={sectorKey} className="flex items-center gap-2 bg-surface-container-low px-4 py-2 rounded-lg border border-outline-variant/10 cursor-pointer hover:bg-surface-container transition-colors">
+                    <input type="checkbox" defaultChecked={['metals', 'energy'].includes(sectorKey)} className="accent-primary" />
+                    <span className="text-xs font-medium">{t[sectorKey as keyof typeof t]}</span>
                   </label>
                 ))}
               </div>
@@ -3127,8 +3482,8 @@ const SettingsView = ({ language, userRole, setUserRole }: { language: 'es' | 'e
         </section>
 
         <div className="flex justify-end gap-4">
-          <button className="px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest border border-outline-variant/20 hover:bg-surface-container transition-colors">Cancelar</button>
-          <button className="px-8 py-3 bg-primary text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:opacity-90 transition-opacity">Guardar Cambios</button>
+          <button className="px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest border border-outline-variant/20 hover:bg-surface-container transition-colors">{t.cancel}</button>
+          <button className="px-8 py-3 bg-primary text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:opacity-90 transition-opacity">{t.saveChanges}</button>
         </div>
       </div>
     </div>
@@ -3149,6 +3504,12 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [userRole, setUserRole] = useState<'admin' | 'operator' | 'viewer'>('admin');
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'Nuevo Pago', desc: 'Se ha generado un nuevo pago para Aurum Metals SA.', time: 'Hace 5 min', read: false, type: 'settlement' },
+    { id: 2, title: 'Documento Verificado', desc: 'El contrato para la operación #8492 ha sido verificado.', time: 'Hace 20 min', read: false, type: 'doc' },
+    { id: 3, title: 'Alerta de Mercado', desc: 'El precio del Cobre ha subido un 2.5% en la última hora.', time: 'Hace 1 hora', read: true, type: 'market' },
+  ]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const t = TRANSLATIONS[language];
 
@@ -3231,6 +3592,10 @@ export default function App() {
               filteredResults={filteredResults}
               language={language}
               onNavigate={setActiveTab}
+              notifications={notifications}
+              showNotifications={showNotifications}
+              setShowNotifications={setShowNotifications}
+              setNotifications={setNotifications}
             />
             
             <main className="md:ml-64 pt-24 px-4 md:px-8 pb-12">
